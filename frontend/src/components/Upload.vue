@@ -1,15 +1,23 @@
 <template>
-  <div style="margin-top: 3rem">
-    <input type="file" multiple @change="handleFiles" accept=".xlsx" :disabled="loading" />
-  </div>
-  <div>
-    <label>
-      <input type="checkbox" name="desc" v-model="desc" :disabled="loading" />
-      第一个工作表游戏排序为发布倒序
-    </label>
-  </div>
-  <div style="text-align: right">
-    <button @click="uploadFiles" :disabled="loading">上传</button>
+  <div class="container">
+    <div>
+      <input type="file" ref="fileInput" multiple @change="handleFiles" accept=".xlsx" :disabled="loading" />
+    </div>
+    <div>
+      <label>
+        <input type="checkbox" name="desc" v-model="desc" :disabled="loading" />
+        In descending order
+      </label>
+    </div>
+    <div>
+      <label>
+        <input type="checkbox" name="fullUpdate" v-model="fullUpdate" :disabled="loading" />
+        Full update
+      </label>
+    </div>
+    <div>
+      <button @click="uploadFiles" :disabled="loading">Upload</button>
+    </div>
   </div>
 </template>
 
@@ -17,8 +25,10 @@
 import { ref } from 'vue';
 import axios from 'axios';
 
+const fileInput = ref<HTMLInputElement | null>(null);
 const files = ref([]);
 const desc = ref(false);
+const fullUpdate = ref(false);
 const loading = ref(false);
 
 const handleFiles = (event: any) => {
@@ -26,21 +36,31 @@ const handleFiles = (event: any) => {
 };
 
 const uploadFiles = async () => {
+  if (!files.value.length) {
+    alert('Please select files.');
+    return;
+  }
+
   loading.value = true;
 
   const formData = new FormData();
   files.value.forEach((file) => formData.append('files', file));
   formData.append('desc', desc.value.toString());
+  formData.append('fullUpdate', fullUpdate.value.toString());
 
   try {
     const res = await axios.post('/api/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     console.log(res.data);
-    alert('上传成功');
+    alert(`Sucessfully added ${res.data.new} game(s), now ${res.data.total} in total.`);
+    if (!!fileInput?.value) {
+      files.value = [];
+      fileInput.value.value = '';
+    }
   } catch (err) {
     console.error(err);
-    alert('上传失败');
+    alert('Upload failed.');
   } finally {
     loading.value = false;
   }
@@ -48,13 +68,25 @@ const uploadFiles = async () => {
 </script>
 
 <style lang="scss" scoped>
-div {
-  width: 300px;
-  margin: 15px auto;
-}
-label {
-  display: flex;
-  align-items: center;
-  font-size: 12px;
+.container {
+  width: 400px;
+  margin: 3em auto;
+  border: 1px solid #535bf2;
+  padding: 2rem;
+
+  > div {
+    margin-bottom: 0.5rem;
+    text-align: left;
+
+    &:first-child {
+      margin-bottom: 3rem;
+    }
+
+    &:last-child {
+      margin-top: 2rem;
+      margin-bottom: 0;
+      text-align: right;
+    }
+  }
 }
 </style>

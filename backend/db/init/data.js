@@ -1,4 +1,3 @@
-const args = process.argv.slice(2);
 const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
@@ -16,12 +15,14 @@ const files = fs
 
 const dbPath = path.join(__dirname, '../data.db');
 const db = new Database(dbPath);
-const desc = args[0]?.split('=')[0] === 'desc';
+const args = process.argv.slice(2);
+const isDesc = args.includes('desc');
+const isFullUpdate = args.includes('full');
 
 try {
-  importdata(files, desc, db);
-} catch (error) {
-  console.error(error);
+  importdata(files, { descend: isDesc, fullUpdate: isFullUpdate }, db);
+} catch (err) {
+  console.error(err);
 } finally {
   db.close();
 }

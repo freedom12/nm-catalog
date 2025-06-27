@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const excel = require('./excel');
 const [lang, hardware, game, track] = [
   require('../db/schema/lang'),
@@ -10,21 +12,32 @@ const { getTransaction } = require('../db/transaction');
 /**
  * Import data from .xlsx
  *
- * @param { { path :string[], fileName: string[] }[]} files
- * @param {boolean} desc
- * @param {boolean} deleteAfter
- * @param {object} [db=require('../db')]
+ * @param { { path: string[], fileName: string[] }[]} files
+ * @param { descend: boolean, fullUpdate: boolean } settings
+ * @param { object } [db=require('../db')]
  */
-const importdata = (files, desc, deleteAfter = false, db = require('../db')) => {
-  db.prepare(game.delete()).run();
-  db.prepare(track.delete()).run();
+const importdata = (files, settings, db = require('../db')) => {
+  const fullUpdate = settings.fullUpdate;
+  if (fullUpdate) {
+    db.prepare(game.delete()).run();
+    db.prepare(track.delete()).run();
+  }
 
-  const [sources, filenames] = [excel.readFile(files.map((x) => x.path)), files.map((x) => x.filename, deleteAfter)];
+  const [sources, filenames] = [excel.readFile(files.map((x) => x.path)), files.map((x) => x.filename)];
   const ms = Date.now();
   const langs = db
     .prepare(lang.select())
     .all()
     .map((x) => x.id);
+  const existedGameIds = !fullUpdate
+    ? db
+        .prepare(game.select())
+        .all()
+        .map((x) => x.id)
+    : [];
+  const newGameIds = sources[0][0].filter((row) => !existedGameIds.includes(row.id)).map((row) => row.id);
+  const json = JSON.stringify(newGameIds);
+  console.log('\x1b[32m%s\x1b[0m', `+++++++++ ${newGameIds.length} new game(s) found. +++++++++`);
 
   sources.forEach((workbook, i) => {
     const lang = ((fileName) => {
@@ -37,31 +50,40 @@ const importdata = (files, desc, deleteAfter = false, db = require('../db')) => 
       if (j === 0) {
         const trans = getTransaction(game.insert(lang), db);
         trans(
-          sheet.map((row, k) => [
-            row.id,
-            row.year,
-            row.hardware,
-            row.islink ? sheet[desc ? k - 1 : k + 1].id : '',
-            row.thumbnailurl.split('/').reverse()[0],
-            row.name,
-            ms + (desc ? -k : k),
-          ])
+          sheet
+            .filter((row) => {
+              if (fullUpdate) {
+                return true;
+              } else {
+                return !existedGameIds.includes(row.id);
+              }
+            })
+            .map((row, k) => [
+              row.id,
+              row.year,
+              row.hardware,
+              row.islink ? sheet[settings.descend ? k - 1 : k + 1].id : '',
+              row.thumbnailurl.split('/').reverse()[0],
+              row.name,
+              ms + (settings.descend ? -k : k),
+            ])
         );
       } else {
         const games = workbook[0];
-        tracks.push(
-          ...sheet.map((row) => [
-            row.id,
-            games[j + diff].id,
-            row.index,
-            row.duration,
-            +row.isloop,
-            +row.isbest,
-            row.thumbnailurl.split('/').reverse()[0],
-            row.name,
-          ])
-        );
-
+        if (fullUpdate || (!fullUpdate && newGameIds.includes(workbook[0][j + diff].id))) {
+          tracks.push(
+            ...sheet.map((row) => [
+              row.id,
+              games[j + diff].id,
+              row.index,
+              row.duration,
+              +row.isloop,
+              +row.isbest,
+              row.thumbnailurl.split('/').reverse()[0],
+              row.name,
+            ])
+          );
+        }
         if (j < workbook.length - 1) {
           if (games[j + diff + 1].islink) {
             diff++;
@@ -74,7 +96,16 @@ const importdata = (files, desc, deleteAfter = false, db = require('../db')) => 
     });
   });
 
-  return sources;
+  setTimeout(() => {
+    const filePath = path.join(__dirname, '../files', 'new_game.json');
+    fs.writeFileSync(filePath, json, 'utf8');
+  });
+
+  console.log('Sucessfully updated.');
+  return {
+    total: sources[0][0].length,
+    new: newGameIds.length,
+  };
 };
 
 module.exports = { importdata };

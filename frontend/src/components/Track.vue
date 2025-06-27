@@ -70,7 +70,7 @@ function getTrackList(gameList: Game[]) {
 <style lang="scss" scoped>
 .container {
   max-width: 992px;
-  margin: 0.2rem auto 0;
+  margin: 0.2rem auto 3rem;
   padding: 1rem;
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
   transform: translateY(0.5rem);

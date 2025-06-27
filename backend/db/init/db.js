@@ -1,4 +1,3 @@
-const args = process.argv.slice(2);
 const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
@@ -11,8 +10,10 @@ const [lang, hardware, game, track] = [
 const { getTransaction } = require('../transaction');
 
 const dbPath = path.join(__dirname, '../data.db');
-const force = args[0]?.split('=')[0] === 'force';
-if (force) {
+const args = process.argv.slice(2);
+const isForced = args.includes('force');
+
+if (isForced) {
   fs.unlinkSync(dbPath);
   console.warn('Delete existed database.');
 }
@@ -32,8 +33,8 @@ if (!fs.existsSync(dbPath)) {
     db.close();
 
     console.log('Database initialized!');
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     db.close();
     fs.unlinkSync(dbPath);
   }

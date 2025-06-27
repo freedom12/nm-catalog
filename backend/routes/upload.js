@@ -7,23 +7,26 @@ const upload = multer({ dest: './files/' });
 const { importdata } = require('../utils/import');
 
 router.post('/', upload.array('files'), (req, res) => {
-  const [files, desc] = [req.files, req.body.desc === 'true'];
+  const [files, desc, fullUpdate] = [req.files, req.body.desc === 'true', req.body.fullUpdate === 'true'];
   if (!files || files.length === 0) return res.status(400).send('No files uploaded');
 
-  const result = importdata(
-    files.map((file) => ({
-      path: file.path,
-      filename: file.originalname,
-    })),
-    desc,
-    true
-  );
-
-  files.forEach((file) => {
-    fs.unlinkSync(file.path);
-  });
-
-  res.json(result);
+  try {
+    const result = importdata(
+      files.map((file) => ({
+        path: file.path,
+        filename: file.originalname,
+      })),
+      { descend: desc, fullUpdate: fullUpdate }
+    );
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    files.forEach((file) => {
+      fs.unlinkSync(file.path);
+    });
+  }
 });
 
 module.exports = router;

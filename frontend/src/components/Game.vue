@@ -33,7 +33,7 @@ const gameList = ref<Game[]>([]);
 const gameListByYear = ref<GameGroup[]>([]);
 const gameListByDevice = ref<GameGroup[]>([]);
 const groupByWays = ['By Platfom', 'Added', 'Release'];
-const groupBy = ref<string>('By Platfom');
+const groupBy = ref<string>(groupByWays[0]);
 let gameGroup = ref<GameGroup[]>([]);
 
 axios
@@ -48,6 +48,7 @@ axios
   .then((res) => {
     gameListByDevice.value = getGameGroupByDevice(gameList.value, res.data);
     gameGroup.value = gameListByDevice.value;
+    onGroupByChange();
   });
 
 function getGameGroupByYear(gameList: Game[]): GameGroup[] {
@@ -85,8 +86,14 @@ function getGameGroupByDevice(gameList: Game[], device: Hardware[]): GameGroup[]
   return result;
 }
 
-function onGroupByChange(event: Event) {
-  const value = (event.target as HTMLSelectElement).value;
+function onGroupByChange(event?: Event) {
+  let value = '';
+  if (!event) {
+    value = localStorage.getItem('groupBy') || groupBy.value;
+    groupBy.value = value;
+  } else {
+    value = (event.target as HTMLSelectElement).value;
+  }
   switch (value) {
     case 'By Platfom':
       gameGroup.value = gameListByDevice.value;
@@ -103,6 +110,7 @@ function onGroupByChange(event: Event) {
       gameGroup.value = gameListByYear.value;
       break;
   }
+  localStorage.setItem('groupBy', value);
 }
 </script>
 
@@ -137,7 +145,8 @@ $gap: 16px;
 
       > img {
         display: block;
-        width: 100%;
+        width: 200px;
+        height: 200px;
         margin-bottom: 8px;
         border-radius: 8px;
         cursor: pointer;
@@ -173,6 +182,7 @@ $gap: 16px;
         > img {
           display: inline-block;
           width: 50px;
+          height: 50px;
           margin-bottom: 8px;
           border-radius: 8px;
           cursor: pointer;

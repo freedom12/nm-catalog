@@ -1,20 +1,24 @@
 <template>
-  <header id="header" @click.stop="router.push(`/`)">Nintendo Music Catalog</header>
-  <div class="mask"></div>
+  <header id="header" @click.stop="router.push(`/`)" v-if="showParent">Nintendo Music Catalog</header>
+  <div class="mask" v-if="showParent"></div>
   <RouterView v-slot="{ Component, route }">
     <keep-alive include="Game,Track">
       <component :is="Component" :key="route.fullPath" />
     </keep-alive>
   </RouterView>
-  <Lang></Lang>
+  <Lang v-if="showParent"></Lang>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import Lang from './components/Lang.vue';
 
+const route = useRoute();
 const router = useRouter();
 document.title = 'Nintendo Music Catalog';
+
+const showParent = computed(() => !route.path.includes('upload'));
 </script>
 
 <style lang="scss" scoped>
