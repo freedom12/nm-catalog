@@ -1,10 +1,10 @@
 <template>
   <div class="container">
     <div class="game" v-if="game">
-      <img :src="`./assets/img/${game.img}.jpg`" @click.stop="openSourceImg(game.img)" loading="lazy" />
+      <img :src="gameImgMap.get(store.mainLang)" @click.stop="openSourceImg(game, store.mainLang)" loading="lazy" />
       <div>
         <h2>
-          {{ getTitle(game, store.mainLang) }}<br />
+          {{ getLangTitle(game, store.mainLang) }}<br />
           <small>{{ game.year }} | {{ game.hardware }}</small>
         </h2>
         <p v-for="lang of store.langList.filter((x) => isShowTitle(game, x.id))" :key="lang.id">
@@ -16,11 +16,11 @@
       <h3>{{ trackList.length }} tracks</h3>
       <div v-for="track in trackList" :key="track.idx">
         <div>
-          <img :src="`./assets/img/${track.img}.jpg`" @click.stop="openSourceImg(track.img)" loading="lazy" />
+          <img :src="trackImgMap?.get(store.mainLang)?.get(track)" @click.stop="openSourceImg(track, store.mainLang)" loading="lazy" />
         </div>
         <div>
           <h4>
-            {{ track.idx }}. {{ getTitle(track, store.mainLang) }} <small>({{ track.duration }})</small>
+            {{ track.idx }}. {{ getLangTitle(track, store.mainLang) }} <small>({{ track.duration }})</small>
           </h4>
           <p v-for="lang of store.langList.filter((x) => isShowTitle(track, x.id))" :key="lang.id">
             <b>{{ lang.id }}</b> {{ getLangTitle(track, lang.id) }}
@@ -37,7 +37,7 @@ import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { useStore } from '../stores';
 import type { Game, Track } from '../types';
-import { getLangTitle, isShowTitle, openSourceImg } from '../utils/common';
+import { getLangTitle, isShowTitle, getImgSrc, openSourceImg } from '../utils/common';
 
 defineOptions({ name: 'Track' });
 defineProps<{ game: Game }>();
@@ -47,7 +47,8 @@ const gid = route.params.gid as string;
 const store = useStore();
 const game = ref<Game>();
 const trackList = ref<Track[]>([]);
-const getTitle = getLangTitle;
+const gameImgMap = ref<Map<string, string>>(new Map<string, string>());
+const trackImgMap = ref<Map<string, Map<Track, string>>>(new Map<string, Map<Track, string>>());
 
 if (!store.gameList.length) {
   axios.get('/api/game').then((res) => {
@@ -63,6 +64,18 @@ function getTrackList(gameList: Game[]) {
   const id = game.value.link || game.value.id;
   axios.get(`/api/game/${id}`).then((res) => {
     trackList.value = res.data;
+
+    for (const lang of store.langList) {
+      gameImgMap.value.set(lang.id, getImgSrc(game.value, lang.id));
+
+      if (!trackImgMap.value.has(lang.id)) {
+        const imgMap = new Map<Track, string>();
+        for (const track of trackList.value) {
+          imgMap.set(track, getImgSrc(track, lang.id));
+        }
+        trackImgMap.value.set(lang.id, imgMap);
+      }
+    }
   });
 }
 </script>
@@ -84,6 +97,7 @@ function getTrackList(gameList: Game[]) {
 
     > img {
       display: block;
+      width: 200px;
       height: 200px;
     }
 
@@ -165,6 +179,7 @@ function getTrackList(gameList: Game[]) {
       padding-bottom: 0;
 
       > img {
+        width: 80px;
         height: 80px;
       }
 

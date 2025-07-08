@@ -68,8 +68,8 @@ const importdata = (files, settings, db = require('../db')) => {
                 row.year,
                 row.hardware,
                 row.islink ? sheet[linkIdx].id : '',
-                row.thumbnailurl.split('/').reverse()[0],
                 row.name,
+                row.thumbnailurl.split('/').reverse()[0],
                 ms + (settings.descend ? -k : k),
               ];
             })
@@ -85,8 +85,8 @@ const importdata = (files, settings, db = require('../db')) => {
               row.duration,
               +row.isloop,
               +row.isbest,
-              row.thumbnailurl.split('/').reverse()[0],
               row.name,
+              row.thumbnailurl.split('/').reverse()[0],
             ])
           );
         }

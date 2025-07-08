@@ -10,7 +10,7 @@
     <h3>{{ group.name }}</h3>
     <div class="game">
       <div class="card" v-for="game in group.games" :key="game.id">
-        <img :src="`./assets/img/${game.img}.jpg`" @click.stop="route.push(`/${game.id}`)" loading="lazy" />
+        <img :src="gameImgMap?.get(store.mainLang)?.get(game)" @click.stop="route.push(`/${game.id}`)" loading="lazy" />
         <router-link :to="`/${game.id}`">{{ getLangTitle(game, store.mainLang) }}</router-link>
       </div>
     </div>
@@ -23,7 +23,7 @@ import axios from 'axios';
 import { useStore } from '../stores';
 import { useRouter } from 'vue-router';
 import type { Game, GameGroup, Hardware } from '../types';
-import { getLangTitle } from '../utils/common';
+import { getLangTitle, getImgSrc } from '../utils/common';
 
 defineOptions({ name: 'Game' });
 
@@ -35,6 +35,7 @@ const gameListByDevice = ref<GameGroup[]>([]);
 const groupByWays = ['By Platfom', 'Added', 'Release'];
 const groupBy = ref<string>(groupByWays[0]);
 let gameGroup = ref<GameGroup[]>([]);
+const gameImgMap = ref<Map<string, Map<Game, string>>>(new Map<string, Map<Game, string>>());
 
 axios
   .get('/api/game')
@@ -49,6 +50,16 @@ axios
     gameListByDevice.value = getGameGroupByDevice(gameList.value, res.data);
     gameGroup.value = gameListByDevice.value;
     onGroupByChange();
+
+    for (const lang of store.langList) {
+      if (!gameImgMap.value.has(lang.id)) {
+        const imgMap = new Map<Game, string>();
+        for (const game of gameList.value) {
+          imgMap.set(game, getImgSrc(game, lang.id));
+        }
+        gameImgMap.value.set(lang.id, imgMap);
+      }
+    }
   });
 
 function getGameGroupByYear(gameList: Game[]): GameGroup[] {

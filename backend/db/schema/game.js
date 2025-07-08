@@ -5,7 +5,6 @@ module.exports = {
       year INTEGER,
       hardware TEXT,
       link TEXT,
-      img TEXT,
       title_de_DE TEXT,
       title_en_US TEXT,
       title_es_ES TEXT,
@@ -15,6 +14,15 @@ module.exports = {
       title_ko_KR TEXT,
       title_zh_CN TEXT,
       title_zh_TW TEXT,
+      img_de_DE TEXT,
+      img_en_US TEXT,
+      img_es_ES TEXT,
+      img_fr_FR TEXT,
+      img_it_IT TEXT,
+      img_ja_JP TEXT,
+      img_ko_KR TEXT,
+      img_zh_CN TEXT,
+      img_zh_TW TEXT,
       inserted INTEGER
     );
   `,
@@ -23,12 +31,13 @@ module.exports = {
     lang = lang.replace('-', '_');
     return `
       INSERT INTO game (
-        id, year, hardware, link, img, title_${lang}, inserted
+        id, year, hardware, link, title_${lang}, img_${lang}, inserted
       )
       VALUES (?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO
       UPDATE SET
         title_${lang}=excluded.title_${lang},
+        img_${lang}=excluded.img_${lang},
         link=excluded.link
     `;
   },
