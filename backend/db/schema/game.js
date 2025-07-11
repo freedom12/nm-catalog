@@ -27,6 +27,16 @@ module.exports = {
     );
   `,
   select: () => `SELECT * FROM game ORDER BY inserted DESC`,
+  selectBy: () => `SELECT * FROM game WHERE id = ? ORDER BY inserted DESC`,
+  selectGroupBy: (group) => {
+    if (group === 'hardware') {
+      return `SELECT * FROM game t1 INNER JOIN hardware t2 ON t1.hardware=t2.name ORDER BY t2.year desc, inserted DESC`;
+    } else if (group === 'year') {
+      return `SELECT * FROM game ORDER BY year desc, inserted DESC`;
+    } else {
+      return `SELECT * FROM game ORDER BY inserted DESC`;
+    }
+  },
   insert: (lang) => {
     lang = lang.replace('-', '_');
     return `

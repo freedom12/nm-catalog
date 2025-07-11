@@ -27,7 +27,7 @@ module.exports = {
       img_zh_TW TEXT
     );
   `,
-  select: () => `SELECT * FROM track WHERE gid = ? ORDER BY idx`,
+  selectBy: () => `SELECT * FROM track WHERE gid = ? ORDER BY idx`,
   insert: (lang) => {
     lang = lang.replace('-', '_');
     return `

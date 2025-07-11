@@ -1,13 +1,21 @@
 <template>
-  <div class="container">
-    <div class="game" v-if="game">
-      <img :src="gameImgMap.get(store.mainLang)" @click.stop="openSourceImg(game, store.mainLang)" loading="lazy" />
+  <div class="loading" v-if="loading"></div>
+  <div class="container" v-else>
+    <div class="game">
+      <img
+        :src="gameImgMap.get(store.mainLang)"
+        @click.stop="openSourceImg(game, store.mainLang)"
+        loading="lazy"
+      />
       <div>
         <h2>
           {{ getLangTitle(game, store.mainLang) }}<br />
-          <small>{{ game.year }} | {{ game.hardware }}</small>
+          <small>{{ game?.year }} | {{ game?.hardware }}</small>
         </h2>
-        <p v-for="lang of store.langList.filter((x) => isShowTitle(game, x.id))" :key="lang.id">
+        <p
+          v-for="lang of store.langList.filter((x) => isShowTitle(game, x.id))"
+          :key="lang.id"
+        >
           <b>{{ lang.id }}</b> {{ getLangTitle(game, lang.id) }}
         </p>
       </div>
@@ -16,13 +24,21 @@
       <h3>{{ trackList.length }} tracks</h3>
       <div v-for="track in trackList" :key="track.idx">
         <div>
-          <img :src="trackImgMap?.get(store.mainLang)?.get(track)" @click.stop="openSourceImg(track, store.mainLang)" loading="lazy" />
+          <img
+            :src="trackImgMap?.get(store.mainLang)?.get(track.id)"
+            @click.stop="openSourceImg(track, store.mainLang)"
+            loading="lazy"
+          />
         </div>
         <div>
           <h4>
-            {{ track.idx }}. {{ getLangTitle(track, store.mainLang) }} <small>({{ track.duration }})</small>
+            {{ track.idx }}. {{ getLangTitle(track, store.mainLang) }}
+            <small>({{ track.duration }})</small>
           </h4>
-          <p v-for="lang of store.langList.filter((x) => isShowTitle(track, x.id))" :key="lang.id">
+          <p
+            v-for="lang of store.langList.filter((x) => isShowTitle(track, x.id))"
+            :key="lang.id"
+          >
             <b>{{ lang.id }}</b> {{ getLangTitle(track, lang.id) }}
           </p>
         </div>
@@ -40,7 +56,6 @@ import type { Game, Track } from '../types';
 import { getLangTitle, isShowTitle, getImgSrc, openSourceImg } from '../utils/common';
 
 defineOptions({ name: 'Track' });
-defineProps<{ game: Game }>();
 
 const route = useRoute();
 const gid = route.params.gid as string;
@@ -48,35 +63,36 @@ const store = useStore();
 const game = ref<Game>();
 const trackList = ref<Track[]>([]);
 const gameImgMap = ref<Map<string, string>>(new Map<string, string>());
-const trackImgMap = ref<Map<string, Map<Track, string>>>(new Map<string, Map<Track, string>>());
+const trackImgMap = ref<Map<string, Map<string, string>>>(
+  new Map<string, Map<string, string>>()
+);
+const loading = ref<boolean>(false);
 
-if (!store.gameList.length) {
-  axios.get('/api/game').then((res) => {
-    store.setGameList(res.data);
-    getTrackList(res.data);
-  });
-} else {
-  getTrackList(store.gameList);
-}
+getTrackList();
 
-function getTrackList(gameList: Game[]) {
-  game.value = gameList.find((x: Game) => x.id === gid) as Game;
-  const id = game.value.link || game.value.id;
-  axios.get(`/api/game/${id}`).then((res) => {
-    trackList.value = res.data;
+function getTrackList() {
+  loading.value = true;
+  axios
+    .get(`/api/game/track/${gid}`)
+    .then((res) => {
+      game.value = res.data.game;
+      trackList.value = res.data.tracks;
 
-    for (const lang of store.langList) {
-      gameImgMap.value.set(lang.id, getImgSrc(game.value, lang.id));
+      for (const lang of store.langList) {
+        gameImgMap.value.set(lang.id, getImgSrc(game.value, lang.id));
 
-      if (!trackImgMap.value.has(lang.id)) {
-        const imgMap = new Map<Track, string>();
-        for (const track of trackList.value) {
-          imgMap.set(track, getImgSrc(track, lang.id));
+        if (!trackImgMap.value.has(lang.id)) {
+          const imgMap = new Map<string, string>();
+          for (const track of trackList.value) {
+            imgMap.set(track.id, getImgSrc(track, lang.id));
+          }
+          trackImgMap.value.set(lang.id, imgMap);
         }
-        trackImgMap.value.set(lang.id, imgMap);
       }
-    }
-  });
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 </script>
 

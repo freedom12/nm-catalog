@@ -20,7 +20,7 @@ const existedGameIds = db
 
 (async () => {
   try {
-    const gameWithYears = (await getGamesByYear(langs[0])).releasedAt
+    let gameWithYears = (await getGamesByYear(langs[0])).releasedAt
       .map((x) => {
         x.items.forEach((y) => {
           y.releasedYear = x.releasedYear;
@@ -28,8 +28,13 @@ const existedGameIds = db
         return x;
       })
       .map((x) => x.items.filter((y) => !existedGameIds.includes(y.id)))
-      .filter((x) => x.length > 0)
-      .reduce((a, b) => [...a, ...b]);
+      .filter((x) => x.length > 0);
+    if (gameWithYears.length > 0) {
+      gameWithYears = gameWithYears.reduce((a, b) => [...a, ...b]);
+    } else {
+      console.log('\x1b[32m%s\x1b[0m', `+++++++++ No new game found. +++++++++`);
+      return;
+    }
 
     const gamesByLang = (
       await Promise.all(
@@ -96,8 +101,10 @@ const existedGameIds = db
       'new_game.json',
       gamesByLang[langs[0]].map((x) => x.id)
     );
-  } catch (error) {
-    console.error(error);
+    rw.writeText('res-platform.json', '');
+    rw.writeText('res-year.json', '');
+  } catch (err) {
+    console.error(err);
     process.exit(1);
   }
 })();

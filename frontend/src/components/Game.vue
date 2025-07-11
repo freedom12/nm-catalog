@@ -6,98 +6,89 @@
       </option>
     </select>
   </div>
-  <div class="group" v-for="group in gameGroup" :key="group.name">
-    <h3>{{ group.name }}</h3>
-    <div class="game">
-      <div class="card" v-for="game in group.games" :key="game.id">
-        <img :src="gameImgMap?.get(store.mainLang)?.get(game)" @click.stop="route.push(`/${game.id}`)" loading="lazy" />
-        <router-link :to="`/${game.id}`">{{ getLangTitle(game, store.mainLang) }}</router-link>
+  <div class="loading" v-if="loading"></div>
+  <template v-else>
+    <div class="group" v-for="group in gameGroup" :key="group.name">
+      <h3>{{ group.name }}</h3>
+      <div class="game">
+        <div class="card" v-for="game in group.games" :key="game.id">
+          <img
+            :src="gameImgMap?.get(store.mainLang)?.get(game.id)"
+            @click.stop="route.push(`/${game.id}`)"
+            loading="lazy"
+          />
+          <router-link :to="`/${game.id}`">{{
+            getLangTitle(game, store.mainLang)
+          }}</router-link>
+        </div>
       </div>
     </div>
-  </div>
+  </template>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import axios from 'axios';
 import { useStore } from '../stores';
 import { useRouter } from 'vue-router';
-import type { Game, GameGroup, Hardware } from '../types';
+import type { Game, GameGroup } from '../types';
 import { getLangTitle, getImgSrc } from '../utils/common';
 
 defineOptions({ name: 'Game' });
 
 const route = useRouter();
 const store = useStore();
-const gameList = ref<Game[]>([]);
-const gameListByYear = ref<GameGroup[]>([]);
-const gameListByDevice = ref<GameGroup[]>([]);
-const groupByWays = ['By Platfom', 'Added', 'Release'];
+const groupByWays = ['By Platform', 'Added', 'Release'];
+const gameDict: {
+  [name: (typeof groupByWays)[number]]: { url: string; content: Game[] };
+} = {
+  'By Platform': { url: '/api/game/hardware', content: [] },
+  Added: { url: '/api/game/recent', content: [] },
+  Release: { url: '/api/game/release', content: [] },
+};
 const groupBy = ref<string>(groupByWays[0]);
-let gameGroup = ref<GameGroup[]>([]);
-const gameImgMap = ref<Map<string, Map<Game, string>>>(new Map<string, Map<Game, string>>());
+const gameGroup = ref<GameGroup[]>([]);
+const gameImgMap = ref<Map<string, Map<string, string>>>(
+  new Map<string, Map<string, string>>()
+);
+const loading = ref<boolean>(false);
 
-axios
-  .get('/api/game')
-  .then((res) => {
-    const result = res.data;
-    store.setGameList(result);
-    gameList.value = result;
-    gameListByYear.value = getGameGroupByYear(result);
-    return axios.get('/api/list/hardware');
-  })
-  .then((res) => {
-    gameListByDevice.value = getGameGroupByDevice(gameList.value, res.data);
-    gameGroup.value = gameListByDevice.value;
-    onGroupByChange();
+onMounted(async () => {
+  await onGroupByChange();
 
-    for (const lang of store.langList) {
-      if (!gameImgMap.value.has(lang.id)) {
-        const imgMap = new Map<Game, string>();
-        for (const game of gameList.value) {
-          imgMap.set(game, getImgSrc(game, lang.id));
-        }
-        gameImgMap.value.set(lang.id, imgMap);
+  const gameList = gameGroup.value.map((x) => x.games).reduce((a, b) => [...a, ...b]);
+  for (const lang of store.langList) {
+    if (!gameImgMap.value.has(lang.id)) {
+      const imgMap = new Map<string, string>();
+      for (const game of gameList) {
+        imgMap.set(game.id, getImgSrc(game, lang.id));
       }
+      gameImgMap.value.set(lang.id, imgMap);
     }
-  });
+  }
+});
 
-function getGameGroupByYear(gameList: Game[]): GameGroup[] {
-  const map = new Map<number, Game[]>();
-  gameList.forEach((game: Game) => {
-    if (!map.has(game.year)) {
-      map.set(game.year, []);
-    }
-    map.get(game.year)?.push(game);
-  });
-  const result = Array.from(map.entries())
-    .sort((a, b) => {
-      return b[0] - a[0];
-    })
-    .map((x) => ({
-      name: x[0].toString(),
-      games: x[1],
-    }));
+async function getGamesByGroup(groupBy: (typeof groupByWays)[number]) {
+  const target = gameDict[groupBy];
+  if (target.content.length > 0) {
+    return target.content;
+  }
+
+  let result = [];
+  try {
+    loading.value = true;
+    const res = await axios.get(target.url);
+    result = res.data;
+  } catch (err) {
+    console.error(err);
+  } finally {
+    loading.value = false;
+  }
+  target.content = result;
   return result;
 }
 
-function getGameGroupByDevice(gameList: Game[], device: Hardware[]): GameGroup[] {
-  device = device.sort((a, b) => b.year - a.year);
-  const map = new Map<string, Game[]>();
-  device.forEach((x) => {
-    map.set(x.name.toLocaleLowerCase(), []);
-  });
-  gameList.forEach((x) => {
-    map.get(x.hardware.toLocaleLowerCase())?.push(x);
-  });
-  const result = Array.from(map.entries()).map((x, i) => ({
-    name: device[i].name,
-    games: x[1],
-  }));
-  return result;
-}
-
-function onGroupByChange(event?: Event) {
+async function onGroupByChange(event?: Event) {
   let value = '';
   if (!event) {
     value = localStorage.getItem('groupBy') || groupBy.value;
@@ -105,22 +96,7 @@ function onGroupByChange(event?: Event) {
   } else {
     value = (event.target as HTMLSelectElement).value;
   }
-  switch (value) {
-    case 'By Platfom':
-      gameGroup.value = gameListByDevice.value;
-      break;
-    case 'Added':
-      gameGroup.value = [
-        {
-          name: '',
-          games: gameList.value,
-        },
-      ];
-      break;
-    case 'Release':
-      gameGroup.value = gameListByYear.value;
-      break;
-  }
+  gameGroup.value = await getGamesByGroup(value);
   localStorage.setItem('groupBy', value);
 }
 </script>
@@ -165,6 +141,7 @@ $gap: 16px;
 
       > a {
         font-size: 1.1rem;
+        cursor: pointer;
       }
     }
   }

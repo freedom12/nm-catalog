@@ -25,8 +25,8 @@ export interface GameGroup {
 }
 
 export interface Track extends LangTitleObject {
-  id: number;
-  gid: number;
+  id: string;
+  gid: string;
   idx: number;
   duration: string;
   isloop: number;

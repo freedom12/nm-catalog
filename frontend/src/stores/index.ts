@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia';
-import type { Game, Lang } from '../types';
+import type { Lang } from '../types';
 
 export const useStore = defineStore('app', {
   state: () => ({
     mainLang: localStorage.getItem('lang') || 'en-US',
-    langList: [] as Lang[],
-    gameList: [] as Game[]
+    langList: [] as Lang[]
   }),
   actions: {
     setMainLang(lang: string) {
@@ -14,9 +13,6 @@ export const useStore = defineStore('app', {
     },
     setLangList(data: Lang[]) {
       this.langList = data;
-    },
-    setGameList(data: Game[]) {
-      this.gameList = data;
     }
   },
 });
