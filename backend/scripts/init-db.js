@@ -1,15 +1,22 @@
+/*
+  Initialized database
+  
+  -- force    # force to create new database file
+*/
+
 const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
-const [lang, hardware, game, track] = [
-  require('../schema/lang'),
-  require('../schema/hardware'),
-  require('../schema/game'),
-  require('../schema/track'),
+const [lang, hardware, game, track, relate] = [
+  require('../db/schema/lang'),
+  require('../db/schema/hardware'),
+  require('../db/schema/game'),
+  require('../db/schema/track'),
+  require('../db/schema/relate'),
 ];
-const { getTransaction } = require('../transaction');
+const { getTransaction } = require('../db/transaction');
 
-const dbPath = path.join(__dirname, '../data.db');
+const dbPath = path.join(__dirname, '../db/data.db');
 const args = process.argv.slice(2);
 const isForced = args.includes('force');
 
@@ -23,7 +30,7 @@ if (!fs.existsSync(dbPath)) {
 
   const db = new Database(dbPath);
   try {
-    [lang, hardware, game, track].forEach((x) => {
+    [lang, hardware, game, track, relate].forEach((x) => {
       db.exec(x.create());
       if (!!x.preparedData) {
         const trans = getTransaction(x.insert(), db);

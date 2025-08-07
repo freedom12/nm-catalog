@@ -1,8 +1,9 @@
 const excel = require('./excel');
-const [lang, game, track] = [
+const [lang, game, track, relate] = [
   require('../db/schema/lang'),
   require('../db/schema/game'),
   require('../db/schema/track'),
+  require('../db/schema/relate'),
 ];
 const { getTransaction } = require('../db/transaction');
 const rw = require('./rw');
@@ -52,6 +53,7 @@ const importdata = (files, settings, db = require('../db')) => {
     let diff = -1;
     const gameData = [];
     const trackData = [];
+    const relateData = [];
 
     workbook.forEach((sheet, j) => {
       if (j === 0) {
@@ -111,6 +113,24 @@ const importdata = (files, settings, db = require('../db')) => {
       trans = getTransaction(track.insert(lang), db);
       trans(trackData);
     });
+
+    if (i === sources.length - 1) {
+      console.log('\x1b[32m%s\x1b[0m', `Updating related data...`);
+      db.prepare(relate.delete()).run();
+      relateData.push(
+        ...workbook[0]
+          .map((row) => {
+            const data = row?.relatedgame
+              .split('|')
+              .map((x) => workbook[0].find((y) => y.name === x)?.id)
+              .filter((x) => !!x)
+              .map((x) => [row.id, x]);
+            return data.flat(0);
+          })
+          .reduce((a, b) => [...a, ...b])
+      );
+      getTransaction(relate.insert(), db)(relateData);
+    }
   });
 
   setTimeout(() => {

@@ -1,3 +1,11 @@
+/*
+  Download images
+  
+  -- original    # also download original images
+  -- error       # download images of previous error tasks
+  -- --dir=xxx   # set target directory for compressed images
+*/
+
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
@@ -5,9 +13,9 @@ import sharp from 'sharp';
 import pLimit from 'p-limit';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import lang from './db/schema/lang.js';
-import rw from './utils/rw.js';
-import db from './db/index.js';
+import lang from '../db/schema/lang.js';
+import rw from '../utils/rw.js';
+import db from '../db/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -15,6 +23,7 @@ const __dirname = dirname(__filename);
 const args = process.argv.slice(2);
 const isSaveOriginal = args.includes('original');
 const isDownloadError = args.includes('error');
+const prodDir = args.find((x) => x.startsWith('--dir='))?.split('=')[1];
 
 let langs = db
   .prepare(lang.select())
@@ -46,11 +55,11 @@ for (const lang of langs) {
     imgIds = errors[lang];
   }
 
-  const originalDir = path.join(__dirname, 'files/img', `original_${lang}`);
+  const originalDir = path.join(__dirname, '../files/img', `original_${lang}`);
   const compressedDir = path.join(
     __dirname,
-    '../frontend/public/assets',
-    `img_new/img_${lang}`
+    `../${!prodDir ? '../frontend/public/assets/new' : prodDir}`,
+    `img_${lang}`
   );
   fs.mkdirSync(originalDir, { recursive: true });
   fs.mkdirSync(compressedDir, { recursive: true });
@@ -65,13 +74,13 @@ for (const lang of langs) {
 }
 
 const host = 'https://image-assets.m.nintendo.com';
-const sum = tasks.map((x) => x.imgIds.length).reduce((x, y) => x + y, 0);
+const sum = tasks.map((x) => x.imgIds.length).reduce((a, b) => a + b, 0);
 console.log('\x1b[32m%s\x1b[0m', `To download ${sum} image(s).`);
 
 async function processImage(imgId, index, task) {
   try {
-    const response = await axios.get(`${host}/${imgId}`, { responseType: 'arraybuffer' });
-    const buffer = Buffer.from(response.data);
+    const res = await axios.get(`${host}/${imgId}`, { responseType: 'arraybuffer' });
+    const buffer = Buffer.from(res.data);
     const ext = '.jpg';
     const filename = `${imgId}${ext}`;
     const compressedPath = path.join(task.compressedDir, filename);

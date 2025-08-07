@@ -7,10 +7,11 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "init-db": "node db/init/db.js",
-    "init-data": "node db/init/data.js",
-    "dl-img": "node get-img.mjs",
-    "pull-data": "node pull-data.js"
+    "init-db": "node scripts/init-db.js",
+    "init-data": "node scripts/init-data.js",
+    "pull-data": "node scripts/pull-data.js",
+    "get-img": "node scripts/get-img.mjs",
+    "get-img-prod": "node scripts/get-img.mjs --dir=../nia.itomka.com/assets"
   },
   "dependencies": {
     "axios": "^1.9.0",

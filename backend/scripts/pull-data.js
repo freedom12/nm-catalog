@@ -1,12 +1,17 @@
+/*
+  Pull data from Nintendo APIs
+*/
+
 const axios = require('axios');
-const db = require('./db');
-const { getTransaction } = require('./db/transaction');
-const [lang, game, track] = [
-  require('./db/schema/lang'),
-  require('./db/schema/game'),
-  require('./db/schema/track'),
+const db = require('../db');
+const { getTransaction } = require('../db/transaction');
+const [lang, game, track, relate] = [
+  require('../db/schema/lang'),
+  require('../db/schema/game'),
+  require('../db/schema/track'),
+  require('../db/schema/relate'),
 ];
-const rw = require('./utils/rw');
+const rw = require('../utils/rw');
 
 const ms = Date.now();
 const langs = db
@@ -95,6 +100,15 @@ const existedGameIds = db
       trans(trackData);
     }
 
+    const relateDataSet = new Set();
+    for (const game of gameWithYears) {
+      const relatedGames = await getRelateByGame(game.id);
+      relatedGames.forEach((x) => {
+        relateDataSet.add(`${game.id}+${x.id}`).add(`${x.id}+${game.id}`);
+      });
+    }
+    getTransaction(relate.insert(), db)([...relateDataSet].map((x) => x.split('+')));
+
     console.log('Data successfully pulled.');
 
     rw.writeText(
@@ -110,31 +124,38 @@ const existedGameIds = db
 })();
 
 async function getGamesByAdded(lang) {
-  const response = await axios.get(
+  const res = await axios.get(
     `https://api.m.nintendo.com/catalog/games:all?country=JP&lang=${lang}&sortRule=RECENT`
   );
-  return response.data;
+  return res.data;
 }
 
 async function getGamesByYear(lang) {
-  const response = await axios.get(
+  const res = await axios.get(
     `https://api.m.nintendo.com/catalog/gameGroups?country=JP&groupingPolicy=RELEASEDAT&lang=${lang}`
   );
-  return response.data;
+  return res.data;
 }
 
 async function getGamePlayListInfo(gameId) {
-  const response = await axios.get(
+  const res = await axios.get(
     `https://api.m.nintendo.com/catalog/games/${gameId}/relatedPlaylists?country=JP&lang=zh-CN&membership=BASIC&packageType=hls_cbcs&sdkVersion=ios-1.4.0_f362763-1`
   );
-  return response.data;
+  return res.data;
 }
 
 async function getTracksByGame(playlistId, lang) {
-  const response = await axios.get(
+  const res = await axios.get(
     `https://api.m.nintendo.com/catalog/officialPlaylists/${playlistId}?country=JP&lang=${lang}&membership=BASIC&packageType=hls_cbcs&sdkVersion=ios-1.4.0_f362763-1`
   );
-  return response.data;
+  return res.data;
+}
+
+async function getRelateByGame(gameId) {
+  const res = await axios.get(
+    `https://api.m.nintendo.com/catalog/games/${gameId}/relatedGames?country=JP&lang=zh-CN`
+  );
+  return res.data;
 }
 
 function getDuration(ms) {
