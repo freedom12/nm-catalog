@@ -27,7 +27,44 @@ module.exports = {
     );
   `,
   select: () => `SELECT * FROM game ORDER BY inserted DESC`,
-  selectBy: () => `SELECT * FROM game WHERE id = ? ORDER BY inserted DESC`,
+  selectById: () => `SELECT * FROM game WHERE id = ?`,
+  selectEntityById: () => `
+    WITH RECURSIVE chain AS (
+      SELECT *
+      FROM game
+      WHERE id = ?
+
+      UNION ALL
+
+      SELECT t.*
+      FROM game t
+      JOIN chain c ON t.id = c.link
+    )
+    SELECT *
+    FROM chain
+    WHERE link = ''`,
+  selectLinkChainById: () => `
+    WITH RECURSIVE chain(id, link, visited) AS (
+      SELECT id, link, id
+      FROM game
+      WHERE id = ?
+
+      UNION ALL
+      
+      SELECT t.id, t.link, c.visited || ',' || t.id
+      FROM game t
+      JOIN chain c ON t.id = c.link
+      WHERE instr(c.visited, t.id) = 0
+
+      UNION ALL
+
+      SELECT t.id, t.link, c.visited || ',' || t.id
+      FROM game t
+      JOIN chain c ON t.link = c.id
+      WHERE instr(c.visited, t.id) = 0
+    )
+    SELECT DISTINCT id, link
+    FROM chain`,
   selectGroupBy: (group) => {
     if (group === 'hardware') {
       return `SELECT * FROM game t1 INNER JOIN hardware t2 ON t1.hardware=t2.name ORDER BY t2.year desc, inserted DESC`;

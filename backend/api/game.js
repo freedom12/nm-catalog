@@ -145,10 +145,11 @@ router.get('/track/:id', (req, res) => {
   const id = req.params.id;
   const result = {};
   try {
-    let rows = db.prepare(game.selectBy()).all(id);
+    let rows = db.prepare(game.selectById()).all(id);
     result.game = rows[0];
     delete result.game.inserted;
-    rows = db.prepare(track.selectBy()).all(result.game.link || result.game.id);
+    const gid = db.prepare(game.selectEntityById()).all(id)[0].id;
+    rows = db.prepare(track.selectByGid()).all(gid);
     result.tracks = rows;
     res.json(result);
   } catch (err) {
@@ -160,18 +161,20 @@ router.get('/track/:id', (req, res) => {
 router.get('/relate/:id', async (req, res) => {
   const id = req.params.id;
   try {
-    const linkId = db.prepare(game.selectBy()).all(id)[0].link;
-    const gids = db
-      .prepare(relate.selectBy())
-      .all(linkId || id)
+    const rgids = db
+      .prepare(relate.selectByGid())
+      .all(id)
       .map((x) => x.rgid);
+    const linkids = db
+      .prepare(game.selectLinkChainById())
+      .all(id)
+      .map((x) => x.id);
+    const set = new Set([...rgids, ...linkids]);
+    set.delete(id);
     const result = (await getGameByYear())
       .map((x) => x.games)
       .reduce((a, b) => [...a, ...b])
-      .filter(
-        (x) =>
-          gids.includes(x.id) || gids.includes(x.link) || x.link === id || x.id === linkId
-      );
+      .filter((x) => x.id !== id && (set.has(x.id) || set.has(x.link)));
     res.json(result);
   } catch (err) {
     console.error(err);

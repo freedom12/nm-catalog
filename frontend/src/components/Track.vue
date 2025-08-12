@@ -238,7 +238,6 @@ async function getRelateList() {
     margin: 0 0 0.5rem;
     small {
       display: inline-block;
-      margin-left: 0.5em;
       color: rgba(128, 128, 128, 0.7);
 
       &.xs-visible {
@@ -297,6 +296,7 @@ async function getRelateList() {
       small {
         &.xs-visible {
           display: inline-block;
+          margin-left: 0.5em;
         }
       }
     }

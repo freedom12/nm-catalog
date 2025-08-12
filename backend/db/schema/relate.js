@@ -5,7 +5,7 @@ module.exports = {
         rgid TEXT
       );
   `,
-  selectBy: () => `SELECT * FROM relate WHERE gid = ?`,
+  selectByGid: () => `SELECT * FROM relate WHERE gid = ?`,
   insert: () => `INSERT INTO relate (gid, rgid) VALUES (?, ?)`,
   delete: () => `DELETE FROM relate`,
 };
