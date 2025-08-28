@@ -12,6 +12,8 @@ const [lang, game, track, relate] = [
   require('../db/schema/relate'),
 ];
 const rw = require('../utils/rw');
+const args = process.argv.slice(2);
+const isUpdate = args.length > 0;
 
 const ms = Date.now();
 const langs = db
@@ -32,7 +34,11 @@ const existedGameIds = db
         });
         return x;
       })
-      .map((x) => x.items.filter((y) => !existedGameIds.includes(y.id)))
+      .map((x) =>
+        x.items.filter((y) =>
+          !isUpdate ? !existedGameIds.includes(y.id) : args.includes(y.id)
+        )
+      )
       .filter((x) => x.length > 0);
     if (gameWithYears.length > 0) {
       gameWithYears = gameWithYears.reduce((a, b) => [...a, ...b]);
@@ -46,15 +52,17 @@ const existedGameIds = db
         langs.map(async (x) => ({
           [x]: (await getGamesByAdded(x))
             .reverse()
-            .filter((y) => !existedGameIds.includes(y.id)),
+            .filter((y) =>
+              !isUpdate ? !existedGameIds.includes(y.id) : args.includes(y.id)
+            ),
         }))
       )
     ).reduce((a, b) => Object.assign(a, b));
 
-    console.log(
-      '\x1b[32m%s\x1b[0m',
-      `+++++++++ ${gamesByLang[langs[0]].length} new game(s) found. +++++++++`
-    );
+    const msg = !isUpdate
+      ? `${gamesByLang[langs[0]].length} new game(s) found.`
+      : `${gamesByLang[langs[0]].length} game(s) to update.`;
+    console.log('\x1b[32m%s\x1b[0m', `+++++++++ ${msg} +++++++++`);
 
     const playlistInfos = (
       await Promise.all(gamesByLang[langs[0]].map((x) => getGamePlayListInfo(x.id)))
@@ -63,6 +71,11 @@ const existedGameIds = db
       bestTrackIds: x.bestPlaylist.tracks.map((y) => y.id),
     }));
 
+    if (args.length > 0) {
+      gamesByLang[Object.keys(gamesByLang)[0]].forEach((x) => {
+        db.prepare(track.deleteByGid()).run(x.id);
+      });
+    }
     for (const [lang, games] of Object.entries(gamesByLang)) {
       const gameData = games.map((x, i) => [
         x.id,

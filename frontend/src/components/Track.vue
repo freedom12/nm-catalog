@@ -69,7 +69,7 @@
             <router-link :to="`/${relate.id}`">
               {{ getLangTitle(relate, store.mainLang) }}</router-link
             >
-            <small class="xs-visible">({{ relate.year }})</small>
+            <small class="xs-visible">({{ relate.year }} | {{ relate.hardware }})</small>
           </h4>
           <p>{{ relate.year }} | {{ relate.hardware }}</p>
         </div>

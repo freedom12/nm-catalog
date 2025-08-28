@@ -42,4 +42,5 @@ module.exports = {
     `;
   },
   delete: () => `DELETE FROM track`,
+  deleteByGid: () => `DELETE FROM track WHERE gid = ?`,
 };
