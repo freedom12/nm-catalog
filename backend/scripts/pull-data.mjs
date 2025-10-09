@@ -1,19 +1,28 @@
 /*
   Pull data from Nintendo APIs
+  
+  -- full       # full update
+  -- only-game  # only update games (no tracks)
 */
 
-const axios = require('axios');
-const db = require('../db');
-const { getTransaction } = require('../db/transaction');
-const [lang, game, track, relate] = [
-  require('../db/schema/lang'),
-  require('../db/schema/game'),
-  require('../db/schema/track'),
-  require('../db/schema/relate'),
-];
-const rw = require('../utils/rw');
+import axios from 'axios';
+import pLimit from 'p-limit';
+import db from '../db/index.js';
+import { getTransaction } from '../db/transaction.js';
+import lang from '../db/schema/lang.js';
+import game from '../db/schema/game.js';
+import track from '../db/schema/track.js';
+import relate from '../db/schema/relate.js';
+import rw from '../utils/rw.js';
 const args = process.argv.slice(2);
-const isUpdate = args.length > 0;
+const isUpdateSpecific =
+  args.filter((x) =>
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+      x
+    )
+  ).length > 0;
+const isFullUpdate = args.includes('full');
+const isOnlyGame = args.includes('only-game');
 
 const ms = Date.now();
 const langs = db
@@ -36,7 +45,11 @@ const existedGameIds = db
       })
       .map((x) =>
         x.items.filter((y) =>
-          !isUpdate ? !existedGameIds.includes(y.id) : args.includes(y.id)
+          isFullUpdate
+            ? true
+            : !isUpdateSpecific
+            ? !existedGameIds.includes(y.id)
+            : args.includes(y.id)
         )
       )
       .filter((x) => x.length > 0);
@@ -47,31 +60,45 @@ const existedGameIds = db
       return;
     }
 
+    const limit = pLimit(1);
     const gamesByLang = (
       await Promise.all(
-        langs.map(async (x) => ({
-          [x]: (await getGamesByAdded(x))
-            .reverse()
-            .filter((y) =>
-              !isUpdate ? !existedGameIds.includes(y.id) : args.includes(y.id)
-            ),
-        }))
+        langs.map((x) =>
+          limit(async () => {
+            const games = await getGamesByAdded(x);
+            return {
+              [x]: games
+                .reverse()
+                .filter((y) =>
+                  !isUpdateSpecific ? !existedGameIds.includes(y.id) : args.includes(y.id)
+                ),
+            };
+          })
+        )
       )
     ).reduce((a, b) => Object.assign(a, b));
 
-    const msg = !isUpdate
+    const msg = isFullUpdate
+      ? `${gameWithYears.length} games found.`
+      : !isUpdateSpecific
       ? `${gamesByLang[langs[0]].length} new game(s) found.`
       : `${gamesByLang[langs[0]].length} game(s) to update.`;
     console.log('\x1b[32m%s\x1b[0m', `+++++++++ ${msg} +++++++++`);
 
-    const playlistInfos = (
-      await Promise.all(gamesByLang[langs[0]].map((x) => getGamePlayListInfo(x.id)))
-    ).map((x) => ({
-      allPlaylistId: x.allPlaylist.id,
-      bestTrackIds: x.bestPlaylist.tracks.map((y) => y.id),
-    }));
+    let playlistInfos = [];
+    if (!isOnlyGame) {
+      playlistInfos = (
+        await Promise.all(gamesByLang[langs[0]].map((x) => getGamePlayListInfo(x.id)))
+      ).map((x) => ({
+        allPlaylistId: x.allPlaylist.id,
+        bestTrackIds: x.bestPlaylist.tracks.map((y) => y.id),
+      }));
+    }
 
-    if (args.length > 0) {
+    if (isFullUpdate) {
+      db.prepare(game.delete()).run();
+    }
+    if (isUpdateSpecific) {
       gamesByLang[Object.keys(gamesByLang)[0]].forEach((x) => {
         db.prepare(track.deleteByGid()).run(x.id);
       });
@@ -88,22 +115,24 @@ const existedGameIds = db
       ]);
 
       const trackData = [];
-      for (let i = 0; i < games.length; i++) {
-        const game = games[i];
-        if (!game.isGameLink) {
-          const tracks = (
-            await getTracksByGame(playlistInfos[i].allPlaylistId, lang)
-          ).tracks.map((x, j) => [
-            x.id,
-            game.id,
-            j + 1,
-            getDuration(x.media.payloadList[0].durationMillis),
-            +x.media.payloadList[0].containsLoopableMedia,
-            +playlistInfos[i].bestTrackIds.includes(x.id),
-            x.name,
-            x.thumbnailURL.split('/').reverse()[0],
-          ]);
-          trackData.push(...tracks);
+      if (!isOnlyGame) {
+        for (let i = 0; i < games.length; i++) {
+          const game = games[i];
+          if (!game.isGameLink) {
+            const tracks = (
+              await getTracksByGame(playlistInfos[i].allPlaylistId, lang)
+            ).tracks.map((x, j) => [
+              x.id,
+              game.id,
+              j + 1,
+              getDuration(x.media.payloadList[0].durationMillis),
+              +x.media.payloadList[0].containsLoopableMedia,
+              +playlistInfos[i].bestTrackIds.includes(x.id),
+              x.name,
+              x.thumbnailURL.split('/').reverse()[0],
+            ]);
+            trackData.push(...tracks);
+          }
         }
       }
 

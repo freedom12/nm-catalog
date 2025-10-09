@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "init-db": "node scripts/init-db.js",
     "init-data": "node scripts/init-data.js",
-    "pull-data": "node scripts/pull-data.js",
+    "pull-data": "node scripts/pull-data.mjs",
     "get-img": "node scripts/get-img.mjs",
     "get-img-prod": "node scripts/get-img.mjs --dir=../nia.itomka.com/assets"
   },
