@@ -1,16 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-const db = require('../db');
-const [game, track, relate] = [
-  require('../db/schema/game'),
-  require('../db/schema/track'),
-  require('../db/schema/relate'),
-];
+const stmt = require('../db/statements');
 const rw = require('../utils/rw');
 
 function getGameList(groupBy = '') {
-  const rows = db.prepare(game.selectGroupBy(groupBy)).all();
+  const rows = stmt.game.selectGroupBy(groupBy).all();
   rows.forEach((x) => {
     delete x.inserted;
   });
@@ -69,7 +64,7 @@ function getGameByYear() {
   });
 }
 
-router.get('/recent', (req, res) => {
+router.get('/recent', (_, res) => {
   try {
     const result = getGameList();
     res.json([
@@ -83,7 +78,7 @@ router.get('/recent', (req, res) => {
   }
 });
 
-router.get('/hardware', async (req, res) => {
+router.get('/hardware', async (_, res) => {
   const fileName = 'res-platform.json';
   const data = rw.readText(fileName);
 
@@ -131,7 +126,7 @@ router.get('/hardware', async (req, res) => {
   }
 });
 
-router.get('/release', async (req, res) => {
+router.get('/release', async (_, res) => {
   getGameByYear()
     .then((data) => {
       res.json(data);
@@ -145,11 +140,11 @@ router.get('/track/:id', (req, res) => {
   const id = req.params.id;
   const result = {};
   try {
-    let rows = db.prepare(game.selectById()).all(id);
+    let rows = stmt.game.selectById.all(id);
     result.game = rows[0];
     delete result.game.inserted;
-    const gid = db.prepare(game.selectEntityById()).all(id)[0].id;
-    rows = db.prepare(track.selectByGid()).all(gid);
+    const gid = stmt.game.selectEntityById.all(id)[0].id;
+    rows = stmt.track.selectByGid.all(gid);
     result.tracks = rows;
     res.json(result);
   } catch (err) {
@@ -160,16 +155,26 @@ router.get('/track/:id', (req, res) => {
 
 router.get('/relate/:id', async (req, res) => {
   const id = req.params.id;
+
   try {
-    const rgids = db
-      .prepare(relate.selectByGid())
-      .all(id)
-      .map((x) => x.rgid);
-    const linkids = db
-      .prepare(game.selectLinkChainById())
-      .all(id)
-      .map((x) => x.id);
-    const set = new Set([...rgids, ...linkids]);
+    const rgids = stmt.relate.selectByGid.all(id).map((x) => x.rgid);
+    const linkIds = stmt.game.selectLinkChainById.all(id).map((x) => x.id);
+    const linkRgids = [];
+    if (linkIds.length > 0) {
+      const validLinkIds = linkIds.filter((x) => x !== id);
+      for (const linkId of validLinkIds) {
+        const linkGameIds = stmt.game.selectLinkChainById
+          .all(linkId)
+          .map((x) => x.id)
+          .filter((x) => x !== id);
+        linkRgids.push(
+          ...linkGameIds
+            .map((x) => stmt.relate.selectByGid.all(x).map((y) => y.rgid))
+            .flat()
+        );
+      }
+    }
+    const set = new Set([...rgids, ...linkIds, ...linkRgids]);
     set.delete(id);
     const result = (await getGameByYear())
       .map((x) => x.games)

@@ -13,9 +13,8 @@ import sharp from 'sharp';
 import pLimit from 'p-limit';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import lang from '../db/schema/lang.js';
 import rw from '../utils/rw.js';
-import db from '../db/index.js';
+import stmt from '../db/statements.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,10 +24,7 @@ const isSaveOriginal = args.includes('original');
 const isDownloadError = args.includes('error');
 const prodDir = args.find((x) => x.startsWith('--dir='))?.split('=')[1];
 
-let langs = db
-  .prepare(lang.select())
-  .all()
-  .map((x) => x.id);
+let langs = stmt.lang.select.all().map((x) => x.id);
 const targetLang = langs.filter((x) => args.includes(x));
 if (!targetLang.length) {
   const enIdx = langs.indexOf('en-US');
@@ -46,8 +42,8 @@ for (const lang of langs) {
     const langStr = lang.replace('-', '_');
     const diff = lang.includes('en') ? '' : `and img_${langStr} <> img_en_US`;
     const sql = `select img_${langStr} from game where id in (${gameIds}) ${diff} union select img_${langStr} from track where gid in (${gameIds}) ${diff}`;
-    imgIds = db
-      .prepare(sql)
+    imgIds = stmt
+      .sql(sql)
       .all()
       .map((x) => x[`img_${langStr}`]);
   } else {

@@ -14,9 +14,9 @@ const [lang, hardware, game, track, relate] = [
   require('../db/schema/track'),
   require('../db/schema/relate'),
 ];
-const { getTransaction } = require('../db/transaction');
+const { getTransactionBySql } = require('../db/transaction');
 
-const dbPath = path.join(__dirname, '../db/data.db');
+const dbPath = path.join(__dirname, '../files/data.db');
 const args = process.argv.slice(2);
 const isForced = args.includes('force');
 
@@ -33,7 +33,7 @@ if (!fs.existsSync(dbPath)) {
     [lang, hardware, game, track, relate].forEach((x) => {
       db.exec(x.create());
       if (!!x.preparedData) {
-        const trans = getTransaction(x.insert(), db);
+        const trans = getTransactionBySql(x.insert(), db);
         trans(x.preparedData);
       }
     });

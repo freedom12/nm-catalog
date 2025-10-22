@@ -1,11 +1,6 @@
 const excel = require('./excel');
-const [lang, game, track, relate] = [
-  require('../db/schema/lang'),
-  require('../db/schema/game'),
-  require('../db/schema/track'),
-  require('../db/schema/relate'),
-];
-const { getTransaction } = require('../db/transaction');
+const stmt = require('../db/statements');
+const { getTransactionByStatement } = require('../db/transaction');
 const rw = require('./rw');
 
 /**
@@ -18,8 +13,8 @@ const rw = require('./rw');
 const importdata = (files, settings, db = require('../db')) => {
   const fullUpdate = settings.fullUpdate;
   if (fullUpdate) {
-    db.prepare(game.delete()).run();
-    db.prepare(track.delete()).run();
+    stmt.game.delete.run();
+    stmt.track.delete.run();
   }
 
   const [sources, filenames] = [
@@ -27,16 +22,8 @@ const importdata = (files, settings, db = require('../db')) => {
     files.map((x) => x.filename),
   ];
   const ms = Date.now();
-  const langs = db
-    .prepare(lang.select())
-    .all()
-    .map((x) => x.id);
-  const existedGameIds = !fullUpdate
-    ? db
-        .prepare(game.select())
-        .all()
-        .map((x) => x.id)
-    : [];
+  const langs = stmt.lang.select.all().map((x) => x.id);
+  const existedGameIds = !fullUpdate ? stmt.game.select.all().map((x) => x.id) : [];
   const newGameIds = sources[0][0]
     .filter((row) => !existedGameIds.includes(row.id))
     .map((row) => row.id);
@@ -108,15 +95,15 @@ const importdata = (files, settings, db = require('../db')) => {
         }
       }
 
-      let trans = getTransaction(game.insert(lang), db);
+      let trans = getTransactionByStatement(stmt.game.insert(lang));
       trans(gameData);
-      trans = getTransaction(track.insert(lang), db);
+      trans = getTransactionByStatement(stmt.track.insert(lang));
       trans(trackData);
     });
 
     if (i === sources.length - 1) {
       console.log('\x1b[32m%s\x1b[0m', `Updating related data...`);
-      db.prepare(relate.delete()).run();
+      stmt.relate.delete.run();
       relateData.push(
         ...workbook[0]
           .map((row) => {
@@ -129,7 +116,7 @@ const importdata = (files, settings, db = require('../db')) => {
           })
           .reduce((a, b) => [...a, ...b])
       );
-      getTransaction(relate.insert(), db)(relateData);
+      getTransactionByStatement(stmt.relate.insert)(relateData);
     }
   });
 

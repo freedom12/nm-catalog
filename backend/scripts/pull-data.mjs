@@ -7,13 +7,10 @@
 
 import axios from 'axios';
 import pLimit from 'p-limit';
-import db from '../db/index.js';
-import { getTransaction } from '../db/transaction.js';
-import lang from '../db/schema/lang.js';
-import game from '../db/schema/game.js';
-import track from '../db/schema/track.js';
-import relate from '../db/schema/relate.js';
+import stmt from '../db/statements.js';
+import { getTransactionByStatement } from '../db/transaction.js';
 import rw from '../utils/rw.js';
+
 const args = process.argv.slice(2);
 const isUpdateSpecific =
   args.filter((x) =>
@@ -25,14 +22,8 @@ const isFullUpdate = args.includes('full');
 const isOnlyGame = args.includes('only-game');
 
 const ms = Date.now();
-const langs = db
-  .prepare(lang.select())
-  .all()
-  .map((x) => x.id);
-const existedGameIds = db
-  .prepare(game.select())
-  .all()
-  .map((x) => x.id);
+const langs = stmt.lang.select.all().map((x) => x.id);
+const existedGameIds = stmt.game.select.all().map((x) => x.id);
 
 (async () => {
   try {
@@ -96,11 +87,11 @@ const existedGameIds = db
     }
 
     if (isFullUpdate) {
-      db.prepare(game.delete()).run();
+      stmt.game.delete.run();
     }
     if (isUpdateSpecific) {
       gamesByLang[Object.keys(gamesByLang)[0]].forEach((x) => {
-        db.prepare(track.deleteByGid()).run(x.id);
+        stmt.game.deleteByGid.run(x.id);
       });
     }
     for (const [lang, games] of Object.entries(gamesByLang)) {
@@ -136,9 +127,9 @@ const existedGameIds = db
         }
       }
 
-      let trans = getTransaction(game.insert(lang), db);
+      let trans = getTransactionByStatement(stmt.game.insert(lang));
       trans(gameData);
-      trans = getTransaction(track.insert(lang), db);
+      trans = getTransactionByStatement(stmt.track.insert(lang));
       trans(trackData);
     }
 
@@ -149,7 +140,9 @@ const existedGameIds = db
         relateDataSet.add(`${game.id}+${x.id}`).add(`${x.id}+${game.id}`);
       });
     }
-    getTransaction(relate.insert(), db)([...relateDataSet].map((x) => x.split('+')));
+    getTransactionByStatement(stmt.relate.insert)(
+      [...relateDataSet].map((x) => x.split('+'))
+    );
 
     console.log('Data successfully pulled.');
 

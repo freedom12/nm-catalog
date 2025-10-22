@@ -1,22 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../db');
-const [lang, hardware] = [require('../db/schema/lang'), require('../db/schema/hardware')];
+const stmt = require('../db/statements');
 
-router.get('/lang', (req, res) => {
+router.get('/lang', (_, res) => {
   try {
-    const stmt = db.prepare(lang.select());
-    const rows = stmt.all();
+    const rows = stmt.lang.select.all();
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-router.get('/hardware', (req, res) => {
+router.get('/hardware', (_, res) => {
   try {
-    const stmt = db.prepare(hardware.select());
-    const rows = stmt.all();
+    const rows = stmt.hardware.select.all();
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
