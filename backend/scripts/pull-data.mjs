@@ -140,7 +140,7 @@ const existedGameIds = stmt.game.select.all().map((x) => x.id);
         relateDataSet.add(`${game.id}+${x.id}`).add(`${x.id}+${game.id}`);
       });
     }
-    getTransactionByStatement(stmt.relate.insert)(
+    getTransactionByStatement(stmt.game_related.insert)(
       [...relateDataSet].map((x) => x.split('+'))
     );
 

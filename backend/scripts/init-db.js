@@ -7,12 +7,12 @@
 const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
-const [lang, hardware, game, track, relate] = [
+const [lang, hardware, game, track, game_related] = [
   require('../db/schema/lang'),
   require('../db/schema/hardware'),
   require('../db/schema/game'),
   require('../db/schema/track'),
-  require('../db/schema/relate'),
+  require('../db/schema/game_related'),
 ];
 const { getTransactionBySql } = require('../db/transaction');
 
@@ -30,7 +30,7 @@ if (!fs.existsSync(dbPath)) {
 
   const db = new Database(dbPath);
   try {
-    [lang, hardware, game, track, relate].forEach((x) => {
+    [lang, hardware, game, track, game_related].forEach((x) => {
       db.exec(x.create());
       if (!!x.preparedData) {
         const trans = getTransactionBySql(x.insert(), db);

@@ -1,10 +1,10 @@
 const db = require('../db');
-const [lang, hardware, game, track, relate] = [
+const [lang, hardware, game, track, game_related] = [
   require('./schema/lang'),
   require('./schema/hardware'),
   require('./schema/game'),
   require('./schema/track'),
-  require('./schema/relate'),
+  require('./schema/game_related'),
 ];
 
 const statements = {
@@ -12,7 +12,7 @@ const statements = {
   hardware: prepareGroup(db, hardware),
   game: prepareGroup(db, game),
   track: prepareGroup(db, track),
-  relate: prepareGroup(db, relate),
+  game_related: prepareGroup(db, game_related),
   sql: (sql) => db.prepare(sql),
 };
 

@@ -103,7 +103,7 @@ const importdata = (files, settings, db = require('../db')) => {
 
     if (i === sources.length - 1) {
       console.log('\x1b[32m%s\x1b[0m', `Updating related data...`);
-      stmt.relate.delete.run();
+      stmt.game_related.delete.run();
       relateData.push(
         ...workbook[0]
           .map((row) => {
@@ -116,7 +116,7 @@ const importdata = (files, settings, db = require('../db')) => {
           })
           .reduce((a, b) => [...a, ...b])
       );
-      getTransactionByStatement(stmt.relate.insert)(relateData);
+      getTransactionByStatement(stmt.game_related.insert)(relateData);
     }
   });
 

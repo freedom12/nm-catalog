@@ -162,7 +162,7 @@ router.get('/:id/detail', async (req, res) => {
 
       new Promise(async (resolve, reject) => {
         try {
-          const rgids = stmt.relate.selectByGid.all(id).map((x) => x.rgid);
+          const rgids = stmt.game_related.selectByGid.all(id).map((x) => x.rgid);
           const linkIds = stmt.game.selectLinkChainById.all(id).map((x) => x.id);
           const linkRgids = [];
           if (linkIds.length > 0) {
@@ -174,7 +174,7 @@ router.get('/:id/detail', async (req, res) => {
                 .filter((x) => x !== id);
               linkRgids.push(
                 ...linkGameIds
-                  .map((x) => stmt.relate.selectByGid.all(x).map((y) => y.rgid))
+                  .map((x) => stmt.game_related.selectByGid.all(x).map((y) => y.rgid))
                   .flat()
               );
             }
