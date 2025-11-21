@@ -4,14 +4,9 @@
   <main id="main" v-else>
     <div class="group" v-for="[name, section] in sections" :key="name">
       <h3 class="group-title">{{ name }}</h3>
-      <ul class="playlist">
-        <li class="card" v-for="playlist in section" :key="playlist.id">
-          <router-link :to="`/playlist/${playlist.id}`" class="card-link">
-            <img :src="getImgSrc(playlist, store.mainLang)" loading="lazy" />
-            <div class="card-title">
-              {{ getLangTitle(playlist, store.mainLang) }} · {{ playlist.tracksNum }}首
-            </div>
-          </router-link>
+      <ul class="playlist">     
+        <li v-for="playlist in section" :key="playlist.id">
+          <PlaylistCard :playlist="playlist" />
         </li>
       </ul>
     </div>
@@ -21,28 +16,27 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import Header from '@/components/Header.vue';
-import { useStore } from '@/stores';
-import { LocalizationString, PlaylistType, type Playlist, type Track } from '@/types';
+import { LocalizationString, PlaylistType, type Playlist } from '@/types';
+import PlaylistCard from '@/components/PlaylistCard.vue';
 
-import { getLangTitle, getImgSrc } from '@/utils/data-utils';
-
-const store = useStore();
 const loading = ref<boolean>(false);
-const sections = ref<Map<string, Array<Playlist>>>(new Map());
+const sections = ref<Map<string, Playlist[]>>(new Map<string, Playlist[]>());
 onMounted(async () => {
   loading.value = true;
   const response = await fetch('/playlist_section.json');
   const playlistSectionData = await response.json();
   for (const [sectionName, sectionPlaylists] of Object.entries(playlistSectionData)) {
-    const playlists: Array<Playlist> = (sectionPlaylists as any[]).map((playlist: any) => {
+    const playlists: Playlist[] = (sectionPlaylists as any[]).map((playlist: any) => {
       const name = playlist.name;
       const img = playlist.thumbnailURL.split('/').pop()?.split('.').shift();
-      return {
+      const desc = new LocalizationString();
+      desc.set('en_US', playlist.description);
+      const playlistObj: Playlist = {
         id: playlist.id,
         type: playlist.type as PlaylistType,
         tracksNum: playlist.tracksNum,
         isRelatedGame: 0,
-        desc: new LocalizationString({'en_US': playlist.description}),
+        desc: desc,
         title_de_DE: name,
         title_en_US: name,
         title_es_ES: name,
@@ -61,7 +55,8 @@ onMounted(async () => {
         img_ko_KR: img,
         img_zh_CN: img,
         img_zh_TW: img,
-      } as Playlist;
+      };
+      return playlistObj;
     });
     sections.value.set(sectionName, playlists);
   }
@@ -102,88 +97,5 @@ onMounted(async () => {
   list-style: none;
   padding: 0;
   margin: 0;
-}
-
-.card {
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-.card img {
-  width: 100%;
-  height: 300px;
-  object-fit: contain;
-  object-position: center;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-  background-color: #f8f9fa;
-}
-
-.card img:hover {
-  opacity: 0.9;
-}
-
-.card-link {
-  display: flex;
-  flex-direction: column;
-  text-decoration: none;
-  color: #333;
-  height: 100%;
-}
-
-.card-title {
-  padding: 16px;
-  color: #333;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 1.4;
-  transition: color 0.2s ease;
-}
-
-.card:hover .card-title {
-  color: #007bff;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .playlist {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 16px;
-  }
-
-  .card img {
-    height: 150px;
-  }
-
-  .card-title {
-    padding: 12px;
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 480px) {
-  .playlist {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 12px;
-  }
-
-  .card img {
-    height: 120px;
-  }
-
-  .card-title {
-    padding: 10px;
-    font-size: 12px;
-  }
 }
 </style>
