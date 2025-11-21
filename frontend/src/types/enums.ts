@@ -7,8 +7,8 @@ export type GameGroupBy = keyof typeof GameGroupBy;
 
 export const GameDataSection = {
   TRACK: 'Tracks',
-  RELATED: 'Related Games',
   PLAYLIST: 'Playlists',
+  RELATED: 'Related Games',
 };
 export type GameDataSection = keyof typeof GameDataSection;
 

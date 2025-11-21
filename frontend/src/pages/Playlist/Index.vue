@@ -3,10 +3,20 @@
   <div class="loading" v-if="loading"></div>
   <template v-else>
     <main id="main" v-if="data">
-      <h2>播放列表 {{ pid }}</h2>
-      <h2>{{ getLangTitle(data, store.mainLang) }}</h2>
-      <TrackComp :hidden="false"  :data="tracks" :img-map="trackImgMap">
-      </TrackComp>
+      <section class="game">
+        <img :src="getImgSrc(data, store.mainLang)"
+          @click.stop="openSourceImg(data, store.mainLang)" loading="lazy" />
+        <div>
+          <h2 ref="titleRef">
+            {{ getLangTitle(data, store.mainLang) }}<br />
+            <small>{{ data.type }} | {{ data.tracksNum }}</small>
+          </h2>
+        </div>
+      </section>
+      <section class="detail">
+        <TrackComp :hidden="false" :data="tracks" :img-map="trackImgMap">
+        </TrackComp>
+      </section>
     </main>
     <div v-else>
       <p>没有找到播放列表数据</p>
@@ -97,7 +107,7 @@ async function getDetail() {
     var playlist = {
       id: res.data.id,
       type: res.data.type,
-      tracksNum: res.data.tracksNum,
+      tracksNum: res.data.tracks.length,
       isRelatedGame: +res.data.isRelatedGame,
       title_de_DE: name,
       title_en_US: name,
