@@ -8,7 +8,7 @@
         <div>
           <h2 ref="titleRef">
             {{ getLangTitle(data, store.mainLang) }}<br />
-            <small>{{ getPlaylistTypeDesc(data.type) }} · {{ data.tracksNum }}首</small>
+            <small>{{ getPlaylistTypeDesc(data.type) }} · {{ data.tracksNum }}首 · {{ getTotalDuration() }}</small>
           </h2>
         </div>
       </section>
@@ -67,6 +67,28 @@ function getPlaylistTypeDesc(playlistType: PlaylistType): string {
   }
 }
 
+
+function getTotalDuration(): string {
+  let totalSeconds = 0;
+  for (const track of tracks.value) {
+    const parts = track.duration.split(':').map(part => parseInt(part, 10));
+    if (parts.length === 2) {
+      totalSeconds += parts[0] * 60 + parts[1];
+    } else if (parts.length === 3) {
+      totalSeconds += parts[0] * 3600 + parts[1] * 60 + parts[2];
+    }
+  }
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  } else {
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+}
+
+
 async function getDetail() {
   loading.value = true;
   try {
@@ -84,11 +106,13 @@ async function getDetail() {
     for (const [index, track] of res.data.tracks.entries()) {
       const name = track.name;
       const img = track.thumbnailURL.split('/').pop()?.split('.').shift();
+      const durationMillis = track.media.payloadList[0].durationMillis;
+      const duration = `${Math.floor(durationMillis / 60000)}:${Math.floor((durationMillis % 60000) / 1000).toString().padStart(2, '0')}`;
       tracks.value?.push({
         id: track.id,
         gid: track.game.id,
         idx: index + 1,
-        duration: "0:00",
+        duration: duration,
         isloop: 0,
         isbest: 0,
         title_de_DE: name,
