@@ -11,7 +11,7 @@
         </div>
         <div>
           <h4>
-            <router-link :to="`/${relate.id}`">
+            <router-link :to="`/game/${relate.id}`">
               {{ getLangTitle(relate, store.mainLang) }}</router-link
             >
             <span>{{ relate.year }} | {{ relate.hardware }}</span>
