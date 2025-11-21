@@ -8,7 +8,7 @@
         <div>
           <h2 ref="titleRef">
             {{ getLangTitle(data, store.mainLang) }}<br />
-            <small>{{ getPlaylistTypeDesc(data.type) }} · {{ data.tracksNum }}首 · {{ getTotalDuration() }}</small>
+            <small>{{ getPlaylistTypeDesc(data.type) }} · {{ data.tracksNum }}首 · {{ getTotalDuration() }}</small><br />
             <small>{{ data.desc }}</small>
           </h2>
         </div>
@@ -111,7 +111,7 @@ async function getPlaylist() {
       const duration = `${Math.floor(durationMillis / 60000)}:${Math.floor((durationMillis % 60000) / 1000).toString().padStart(2, '0')}`;
       tracks.value?.push({
         id: track.id,
-        gid: track.game.id,
+        gid: track.game?.id,
         idx: index + 1,
         duration: duration,
         isloop: 0,

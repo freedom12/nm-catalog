@@ -6,6 +6,7 @@ const axios = require('axios');
 async function fetchNintendoMusicData(url, lang, res) {
     try {
         url = `https://api.m.nintendo.com/${url}`;
+        console.log('Fetching Nintendo Music Data from URL:', url);
         const response = await axios.get(url, { 
             params: {
                 lang: lang || 'ja-JP',

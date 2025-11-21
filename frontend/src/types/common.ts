@@ -77,7 +77,7 @@ export interface Game extends WithLangData {
 
 export interface Track extends WithLangData {
   id: string;
-  gid: string;
+  gid?: string;
   idx: number;
   duration: string;
   isloop: number;
