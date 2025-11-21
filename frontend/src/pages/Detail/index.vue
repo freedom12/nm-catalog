@@ -107,7 +107,7 @@ async function getDetail() {
     data.value.playlists = []; // Dummy data for playlists
     for (let j = 0; j < 10; j++) {
       data.value.playlists.push({
-        id: 'e55a92d6-12f2-4011-8312-e7b38e2a3c7f',
+        id: '772a2b39-c35d-43fd-b3b1-bf267c01f342',
         type: 'SINGLE_GAME',
         tracksNum: 10,
         title_de_DE: "",
@@ -133,7 +133,7 @@ async function getDetail() {
     }
     for (let j = 0; j < 10; j++) {
       data.value.playlists.push({
-        id: 'e55a92d6-12f2-4011-8312-e7b38e2a3c7f',
+        id: '772a2b39-c35d-43fd-b3b1-bf267c01f342',
         type: 'MULTIPLE',
         tracksNum: 10,
         title_de_DE: "",
