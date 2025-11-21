@@ -1,3 +1,5 @@
+import type { PlaylistType } from "./enums";
+
 interface WithLangData {
   title_de_DE: string;
   title_en_US: string;
@@ -34,6 +36,14 @@ export interface Track extends WithLangData {
   duration: string;
   isloop: number;
   isbest: number;
+}
+
+export interface Playlist extends WithLangData {
+  id: string;
+  type: PlaylistType;
+  tracksNum: number;
+  desc?: string; //type为MULTIPLE/SPECIAL/LOOP时可能存在
+  gid?: string; //type为SINGLE_GAME_ALL/SINGLE_GAME/LOOP/BEST时存在
 }
 
 export interface Lang {

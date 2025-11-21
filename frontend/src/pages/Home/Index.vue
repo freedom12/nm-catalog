@@ -24,10 +24,10 @@
         <li class="card" v-for="game in group.games" :key="game.id">
           <img
             :src="gameImgMap?.get(store.mainLang)?.get(game.id)"
-            @click.stop="route.push(`/${game.id}`)"
+            @click.stop="route.push(`/game/${game.id}`)"
             loading="lazy"
           />
-          <router-link :to="`/${game.id}`" :title="getLangTitle(game, store.mainLang)">
+          <router-link :to="`/game/${game.id}`" :title="getLangTitle(game, store.mainLang)">
             {{ getLangTitle(game, store.mainLang) }}
           </router-link>
         </li>

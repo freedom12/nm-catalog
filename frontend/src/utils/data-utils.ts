@@ -17,7 +17,7 @@ export const getImgSrc = (target: any, lang: string): string => {
   const mainLang = 'en-US',
     fileName = target[`img_${lang.replace('-', '_')}`],
     mainFileName = target['img_en_US'];
-  const result = `./assets/img_${fileName === mainFileName ? mainLang : lang}/${fileName}.jpg`;
+  const result = `/assets/img_${fileName === mainFileName ? mainLang : lang}/${fileName}.jpg`;
   return result;
 }
 

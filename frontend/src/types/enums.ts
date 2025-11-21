@@ -8,9 +8,19 @@ export type GameGroupBy = keyof typeof GameGroupBy;
 export const GameDataSection = {
   TRACK: 'Tracks',
   RELATED: 'Related Games',
-  // PLAYLIST: 'Playlists',
+  PLAYLIST: 'Playlists',
 };
 export type GameDataSection = keyof typeof GameDataSection;
+
+export const PlaylistType = {
+  SINGLE_GAME_ALL: 'SINGLE_GAME_ALL',
+  BEST: 'BEST',
+  LOOP: 'LOOP',
+  SINGLE_GAME: 'SINGLE_GAME',
+  MULTIPLE: 'MULTIPLE',
+  SPECIAL: 'SPECIAL',
+};
+export type PlaylistType = keyof typeof PlaylistType;
 
 export const TrackMode = {
   ALL: 'All',

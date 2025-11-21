@@ -51,6 +51,11 @@
           :data="data.relateds"
           :img-map="gameImgMap"
         ></Related>
+        <Playlist
+          :hidden="gameDataSection !== 'PLAYLIST'"
+          :data="data.playlists"
+          :img-map="playlistImgMap"
+        ></Playlist>
       </section>
     </main>
   </template>
@@ -64,6 +69,7 @@ import { useStore } from '@/stores';
 import Header from '@/components/Header.vue';
 import Track from './components/Track.vue';
 import Related from './components/Related.vue';
+import Playlist from './components/Playlist.vue';
 import { GameDataSection, type GameDetail } from '@/types';
 import { getLangTitle, isShowTitle, getImgSrc, openSourceImg } from '@/utils/data-utils';
 
@@ -78,6 +84,9 @@ const gameImgMap = ref<Map<string, Map<string, string>>>(
   new Map<string, Map<string, string>>()
 );
 const trackImgMap = ref<Map<string, Map<string, string>>>(
+  new Map<string, Map<string, string>>()
+);
+const playlistImgMap = ref<Map<string, Map<string, string>>>(
   new Map<string, Map<string, string>>()
 );
 const loading = ref<boolean>(false);
@@ -95,11 +104,63 @@ async function getDetail() {
     if (!data.value) {
       return;
     }
-
+    data.value.playlists = []; // Dummy data for playlists
+    for (let j = 0; j < 10; j++) {
+      data.value.playlists.push({
+        id: 'e55a92d6-12f2-4011-8312-e7b38e2a3c7f',
+        type: 'SINGLE_GAME',
+        tracksNum: 10,
+        title_de_DE: "",
+        title_en_US: "",
+        title_es_ES: "",
+        title_fr_FR: "",
+        title_it_IT: "",
+        title_ja_IP: "",
+        title_ko_KR: "",
+        title_zh_CN: "世界",
+        title_zh_TW: "",
+        img_de_DE: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_en_US: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_es_ES: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_fr_FR: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_it_IT: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_ja_IP: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_ko_KR: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_zh_CN: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_zh_TW: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+      });
+    }
+    for (let j = 0; j < 10; j++) {
+      data.value.playlists.push({
+        id: 'e55a92d6-12f2-4011-8312-e7b38e2a3c7f',
+        type: 'MULTIPLE',
+        tracksNum: 10,
+        title_de_DE: "",
+        title_en_US: "",
+        title_es_ES: "",
+        title_fr_FR: "",
+        title_it_IT: "",
+        title_ja_IP: "",
+        title_ko_KR: "",
+        title_zh_CN: "世界",
+        title_zh_TW: "",
+        img_de_DE: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_en_US: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_es_ES: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_fr_FR: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_it_IT: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_ja_IP: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_ko_KR: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_zh_CN: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+        img_zh_TW: "7bd01ff9-6710-4372-96d6-5d5f1b6a569e",
+      });
+    }
     for (const lang of store.langList) {
       let imgMap = new Map<string, string>();
       imgMap.set(data.value.game.id, getImgSrc(data.value.game, lang.id));
       gameImgMap.value.set(lang.id, imgMap);
+
+      playlistImgMap.value.set(lang.id, new Map<string, string>());
 
       if (!trackImgMap.value.has(lang.id)) {
         imgMap = new Map<string, string>();
@@ -114,6 +175,13 @@ async function getDetail() {
       const imgMap = gameImgMap.value.get(lang.id);
       for (const game of data.value.relateds) {
         imgMap?.set(game.id, getImgSrc(game, lang.id));
+      }
+    }
+
+    for (const lang of store.langList) {
+      const imgMap = playlistImgMap.value.get(lang.id);
+      for (const playlist of data.value.playlists) {
+        imgMap?.set(playlist.id, getImgSrc(playlist, lang.id));
       }
     }
   } catch (err) {

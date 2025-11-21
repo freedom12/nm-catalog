@@ -1,4 +1,4 @@
-import type { Game, Track } from './common';
+import type { Game, Playlist, Track } from './common';
 
 export interface GameGroup {
   name: string;
@@ -9,4 +9,5 @@ export interface GameDetail {
   game: Game;
   tracks: Track[];
   relateds: Game[];
+  playlists: Playlist[];
 }

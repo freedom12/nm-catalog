@@ -1,0 +1,195 @@
+@use '@/styles/variables.scss' as *;
+
+#select {
+  position: relative;
+  width: 97%;
+  padding-top: 2.3rem;
+  padding-right: 1em;
+  text-align: right;
+  visibility: hidden;
+}
+
+.group {
+  .game {
+    $gap: 16px;
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: $gap;
+
+    .card {
+      width: 200px;
+      height: 285px;
+      margin: calc($gap / 2);
+      border-radius: 8px;
+
+      > img {
+        display: block;
+        width: 200px;
+        height: 200px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      > a {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+        font-size: 1.1rem;
+        text-overflow: ellipsis;
+        word-break: break-word;
+        max-height: calc(1.1rem * 3 * 1.5);
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+#sort-select {
+  $width: 36px;
+
+  position: absolute;
+  left: 8px;
+  top: 0;
+  z-index: 9;
+  transform: translateX(-50%) translateY(-36px);
+  display: flex;
+  align-items: center;
+  width: $width;
+  height: $width;
+  border-radius: 50%;
+  background-color: $sideNav-bgColor;
+  cursor: pointer;
+
+  > span {
+    flex: 1;
+
+    .svg-icon {
+      color: $root-bgColor;
+      transform: translateY(2px);
+    }
+  }
+
+  > div {
+    display: none;
+    position: absolute;
+    right: 0;
+    padding-right: $width * 1.2;
+    transition: all 0.3s ease;
+
+    > ul {
+      border-radius: 8px;
+      border: 3px solid $sideNav-bgColor;
+      padding: 0.5em 2.2em 0.5em 2em;
+      background-color: $root-bgColor;
+      box-shadow: 0 0 5px 2px rgba($root-bgColor, 0.7);
+      color: $sideNav-bgColor;
+      text-align: left;
+      font-weight: bold;
+      font-size: 0.8em;
+
+      > li {
+        position: relative;
+        text-indent: 1.1em;
+        line-height: 2.5em;
+        white-space: nowrap;
+
+        &.active {
+          span:before {
+            content: '√';
+            position: absolute;
+            left: -1.5em;
+          }
+        }
+
+        &:not(.active, :hover) {
+          span {
+            opacity: 0.5;
+          }
+        }
+      }
+    }
+  }
+
+  &:hover {
+    box-shadow: 0 0 5px 0 $sideNav-bgColor;
+
+    > div {
+      display: block;
+    }
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  #sort-select {
+    background-color: $sideNav-bgColor-light;
+
+    > span {
+      .svg-icon {
+        color: $root-bgColor-light;
+      }
+    }
+
+    > div {
+      > ul {
+        border-color: $sideNav-bgColor-light;
+        box-shadow: 0 0 5px 2px rgba($root-bgColor-light, 0.3);
+        background-color: $root-bgColor-light;
+        color: $sideNav-bgColor-light;
+      }
+    }
+
+    &:hover {
+      box-shadow: 0 0 5px 0 $sideNav-bgColor-light;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  #select {
+    width: 100%;
+    padding-top: 3.5rem;
+    padding-bottom: 0.5rem;
+    visibility: visible;
+  }
+
+  .group {
+    h3 {
+      font-size: smaller;
+    }
+
+    .game {
+      display: block;
+
+      .card {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 50px;
+        text-align: left;
+
+        > img {
+          display: inline-block;
+          width: 50px;
+          height: 50px;
+          margin-bottom: 8px;
+          border-radius: 8px;
+          cursor: pointer;
+        }
+
+        a {
+          flex: 1;
+          display: block;
+          margin: 0 1rem 0.5rem;
+          font-size: 0.9rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+}
