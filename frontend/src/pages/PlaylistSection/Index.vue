@@ -1,23 +1,21 @@
 <template>
   <Header :static="true"></Header>
   <div class="loading" v-if="loading"></div>
-  <template v-else>
-    <main id="main">
-      <div class="group" v-for="[name, section] in sections" :key="name">
-        <h3 class="group-title">{{ name }}</h3>
-        <ul class="playlist">
-          <li class="card" v-for="playlist in section" :key="playlist.id">
-            <router-link :to="`/playlist/${playlist.id}`" class="card-link">
-              <img :src="getImgSrc(playlist, store.mainLang)" loading="lazy" />
-              <div class="card-title">
-                {{ getLangTitle(playlist, store.mainLang) }} · {{ playlist.tracksNum }}首
-              </div>
-            </router-link>
-          </li>
-        </ul>
-      </div>
-    </main>
-  </template>
+  <main v-else>
+    <div class="group" v-for="[name, section] in sections" :key="name">
+      <h3 class="group-title">{{ name }}</h3>
+      <ul class="playlist">
+        <li class="card" v-for="playlist in section" :key="playlist.id">
+          <router-link :to="`/playlist/${playlist.id}`" class="card-link">
+            <img :src="getImgSrc(playlist, store.mainLang)" loading="lazy" />
+            <div class="card-title">
+              {{ getLangTitle(playlist, store.mainLang) }} · {{ playlist.tracksNum }}首
+            </div>
+          </router-link>
+        </li>
+      </ul>
+    </div>
+  </main>
 </template>
 
 <script setup lang="ts">
