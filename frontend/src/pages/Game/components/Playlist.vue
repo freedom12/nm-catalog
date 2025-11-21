@@ -1,17 +1,13 @@
 <template>
   <section :hidden="hidden">
-    <div 
-      class="group" 
-      v-for="group in groupedPlaylists" 
-      :key="group.type"
-    >
-      <h3 class="group-title">{{ getTypeLabel(group.type) }}</h3>
+    <div class="group" v-for="group in groupedPlaylists" :key="group.type">
+      <h3 class="group-title">{{ getPlaylistTypeLabel(group.type) }}</h3>
       <ul class="playlist">
         <li class="card" v-for="playlist in group.playlists" :key="playlist.id">
           <router-link :to="`/playlist/${playlist.id}`" class="card-link">
             <img :src="imgMap?.get(store.mainLang)?.get(playlist.id)" loading="lazy" />
             <div class="card-title">
-              {{ getLangTitle(playlist, store.mainLang)}} · {{ playlist.tracksNum }}首
+              {{ getLangTitle(playlist, store.mainLang) }} · {{ playlist.tracksNum }}首
             </div>
           </router-link>
         </li>
@@ -37,7 +33,7 @@ const store = useStore();
 // 按 type 分组播放列表
 const groupedPlaylists = computed(() => {
   const groups = new Map<string, Playlist[]>();
-  
+
   props.data.forEach(playlist => {
     const type = playlist.type;
     if (!groups.has(type)) {
@@ -45,19 +41,24 @@ const groupedPlaylists = computed(() => {
     }
     groups.get(type)!.push(playlist);
   });
-  
+
   return Array.from(groups.entries()).map(([type, playlists]) => ({
     type,
     playlists
   }));
 });
 
-function getTypeLabel(type: string): string {
-  const typeLabels: { [key: string]: string } = {
-    [PlaylistType.SINGLE_GAME]: '单游戏播放列表',
-    [PlaylistType.MULTIPLE]: '多游戏播放列表',
-  };
-  return typeLabels[type] || type;
+function getPlaylistTypeLabel(playlistType: string): string {
+  switch (playlistType) {
+    case PlaylistType.LOOP:
+      return '可更改时长的播放列表';
+    case PlaylistType.MULTIPLE:
+      return '包含系列游戏的播放列表';
+    case PlaylistType.SINGLE_GAME:
+      return '包含单独游戏的播放列表';
+    default:
+      return playlistType;
+  }
 }
 </script>
 
@@ -143,11 +144,11 @@ function getTypeLabel(type: string): string {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 16px;
   }
-  
+
   .card img {
     height: 150px;
   }
-  
+
   .card-title {
     padding: 12px;
     font-size: 13px;
@@ -159,11 +160,11 @@ function getTypeLabel(type: string): string {
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 12px;
   }
-  
+
   .card img {
     height: 120px;
   }
-  
+
   .card-title {
     padding: 10px;
     font-size: 12px;

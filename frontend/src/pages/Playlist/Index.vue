@@ -64,7 +64,7 @@ function getPlaylistTypeDesc(playlistType: PlaylistType): string {
     case PlaylistType.SPECIAL:
       return '特别发布';
     default:
-      return '未知类型';
+      return playlistType;
   }
 }
 
