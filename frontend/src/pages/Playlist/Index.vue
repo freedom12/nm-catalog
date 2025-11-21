@@ -51,7 +51,7 @@ onMounted(async () => {
 function getPlaylistTypeDesc(playlistType: PlaylistType): string {
   switch (playlistType) {
     case PlaylistType.BEST:
-      return '精选';
+      return '精选歌单';
     case PlaylistType.LOOP:
       return '更改时长';
     case PlaylistType.MULTIPLE:

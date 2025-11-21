@@ -11,7 +11,7 @@
           <router-link :to="`/playlist/${playlist.id}`" class="card-link">
             <img :src="imgMap?.get(store.mainLang)?.get(playlist.id)" loading="lazy" />
             <div class="card-title">
-              {{ getLangTitle(playlist, store.mainLang)}} ({{ playlist.tracksNum }})
+              {{ getLangTitle(playlist, store.mainLang)}} · {{ playlist.tracksNum }}首
             </div>
           </router-link>
         </li>
