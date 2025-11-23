@@ -8,6 +8,7 @@
         </option>
       </select>
       <span @click.stop="scrollToTop()">Top ↑</span>
+      <span @click.stop="goSectionGroup()">其他播放列表</span> 
     </label>
   </footer>
 </template>
@@ -18,6 +19,7 @@ import axios from 'axios';
 import type { Lang } from '@/types';
 import { useStore } from '@/stores';
 import { scrollToY } from '@/utils/dom-utils';
+import router from '@/routers';
 
 const store = useStore();
 const langList = ref<Lang[]>([]);
@@ -47,6 +49,11 @@ function onLangChange(event: Event) {
 
 function scrollToTop() {
   scrollToY(0);
+}
+
+// 临时放在这里
+function goSectionGroup() {
+  router.push(`/playlist-section`);
 }
 </script>
 

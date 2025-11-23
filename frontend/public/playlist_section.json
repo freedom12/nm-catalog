@@ -1,0 +1,242 @@
+{
+    "特别发布": [
+        {
+            "description": "先行发布《卡比的驭天飞行者》的11首乐曲。",
+            "id": "240a1c69-d321-4d65-9c55-f48eb9b7ad03",
+            "name": "特别发布《卡比的驭天飞行者》之二",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/467cede4-654b-4a0f-b4da-a2cc0b960f89",
+            "tracksNum": 11,
+            "type": "SPECIAL"
+        },
+        {
+            "description": "先行发布《卡比的驭天飞行者》的7首乐曲。",
+            "id": "93f8c963-9a73-410a-a701-669f81ffd578",
+            "name": "特别发布《卡比的驭天飞行者》之一",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/ebabcec7-d4b5-4917-8eb8-635de5924e10",
+            "tracksNum": 7,
+            "type": "SPECIAL"
+        },
+        {
+            "description": "特别发布《咚奇刚 蕉力全开》的9首乐曲。",
+            "id": "b229dafd-e11c-4713-8e28-2e2cab80703a",
+            "name": "特别发布《咚奇刚 蕉力全开》",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/f7ee234e-84c5-4f64-aa6e-2620c89aebf2",
+            "tracksNum": 9,
+            "type": "SPECIAL"
+        }
+    ],
+    "听听看吧":[
+        {
+            "description": "从收录到Nintendo Music的游戏软件中，挑选了最值得推荐的乐曲。※乐曲的顺序每天都会变化。",
+            "id": "e31b2abb-32c8-4d01-9e8c-83629ff792e3",
+            "name": "Nintendo Music精选",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/421fe88f-d0da-4175-91eb-c721e8553aa1",
+            "tracksNum": 219,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "从收录到Nintendo Music的游戏软件中，挑选了“精选”乐曲。※乐曲的顺序每天都会变化。",
+            "id": "46445c4a-7fba-403c-90b9-5f1d39be404f",
+            "name": "Nintendo Music精选集",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/e06536c8-9a26-4136-849f-d7d16efbdafe",
+            "tracksNum": 2313,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "从“塞尔达传说”的游戏软件中，挑选了最值得推荐的乐曲。※乐曲的顺序每天都会变化。",
+            "id": "808bcbe6-9e6b-4449-9f01-66ae65d3f81b",
+            "name": "塞尔达传说精选",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/3d3b80db-dc38-41bb-b286-1490432c8a2e",
+            "tracksNum": 24,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "从马力欧的游戏软件中，挑选了最值得推荐的乐曲。※乐曲的顺序每天都会变化。",
+            "id": "4fa20eb9-cdea-4848-9044-cdc9a237d7a8",
+            "name": "马力欧精选",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/1edbfa21-a773-4a4e-acd2-fac01f649423",
+            "tracksNum": 56,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "从收录到Nintendo Music的Nintendo Switch游戏软件中，挑选了最值得推荐的乐曲。※乐曲的顺序每天都会变化。",
+            "id": "7cf93e33-67eb-4be9-a850-971335f68c67",
+            "name": "Nintendo Switch精选",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/e5a6247c-c132-4b73-9aa3-ea07cc80c20e",
+            "tracksNum": 65,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "从收录到Nintendo Music的NES游戏软件中，挑选了最值得推荐的乐曲。※乐曲的顺序每天都会变化。",
+            "id": "5db39d9d-9633-4f8f-8c49-c9356777eeb0",
+            "name": "NES精选",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/a8f77510-14a3-4770-997a-24fdafca9c0d",
+            "tracksNum": 74,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "※乐曲的顺序每天都会变化。",
+            "id": "784581a7-ebb9-44c7-8f0d-cf9b07fb1718",
+            "name": "推荐“更改时长”",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/05659b8b-a794-4d18-8e5e-d5c418786d09",
+            "tracksNum": 147,
+            "type": "MULTIPLE"
+        }
+    ],
+    "从现在的心情开始":[
+        {
+            "description": "挑选了适合放松身心时聆听的舒缓乐曲。※乐曲的顺序每天都会变化。",
+            "id": "63c0d96f-8447-43f9-9159-0946aba5a780",
+            "name": "放松一下",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/e9b6ce88-590d-4429-99e4-f494eb16f6ab",
+            "tracksNum": 123,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "挑选了能让人打起精神的快节奏乐曲。※乐曲的顺序每天都会变化。",
+            "id": "fd918c30-cde7-4297-8f0a-1fafdea84a0b",
+            "name": "打起精神来",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/de6d9ac2-62f8-4c33-acbb-69d57ee283b1",
+            "tracksNum": 114,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "收集了能让人感受到秋天气息的乐曲。※乐曲的顺序每天都会变化。",
+            "id": "e5898934-cb1e-4ea0-bc6e-2ddce1c416fa",
+            "name": "聆听秋日",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/317299ca-7aee-4d9a-b90a-b2ecae817997",
+            "tracksNum": 35,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "收集了能让人感受到冬日来临的乐曲。※乐曲的顺序每天都会变化。",
+            "id": "e601687a-8259-4799-b8d2-c026202fee67",
+            "name": "聆听冬日",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/269b740c-8c27-4791-ac51-36add040043c",
+            "tracksNum": 68,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "挑选了适合步行节奏的乐曲。※乐曲的顺序每天都会变化。",
+            "id": "39d56342-6c1e-4d8d-a1fc-7977bce36b30",
+            "name": "步行",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/efb6495b-cc8c-4b98-b848-b174214bc008",
+            "tracksNum": 126,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "挑选了适合跑步节奏的乐曲。※乐曲的顺序每天都会变化。",
+            "id": "14117541-00c7-4e3e-b96f-cfd2d744c20b",
+            "name": "跑步",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/1a374c58-d9fc-45ec-9772-455f4723a440",
+            "tracksNum": 90,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "收集了适合在大家想要热闹起来时听的欢快乐曲。※乐曲的顺序每天都会变化。",
+            "id": "6d2d0bad-90bb-4970-a9f3-28ce0d051f85",
+            "name": "大家一起来",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/b3cb55c2-c3e0-4671-a26d-1fa77b3facb1",
+            "tracksNum": 74,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "收集了能让人感受到鬼怪氛围的乐曲。※乐曲的顺序每天都会变化。",
+            "id": "8716006a-48cb-4218-971a-f0971549f8ab",
+            "name": "或许存在鬼怪",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/64cfbff8-2a80-4b63-bb5b-d26c4273e3fa",
+            "tracksNum": 63,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "收集了能让人感受到清爽夏天的乐曲。※乐曲的顺序每天都会变化。",
+            "id": "128ce722-0654-408f-af90-77f61a917c41",
+            "name": "聆听夏日",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/310a0c69-4d2a-4637-9e18-4b1e00628ced",
+            "tracksNum": 73,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "收集了能让人感受到温暖春天的乐曲。※乐曲的顺序每天都会变化。",
+            "id": "0eea14bf-c4eb-4675-8721-4eaa57a505d4",
+            "name": "聆听春日",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/e5f54b77-090a-4eaa-bd48-81dd66622ad7",
+            "tracksNum": 46,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "挑选了适合睡前聆听的慢节奏乐曲。※乐曲的顺序每天都会变化。",
+            "id": "12acf89a-3064-4fbd-904b-26db3a270c0b",
+            "name": "晚安",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/a7d170d0-f722-486a-9f44-84d991c1c0ee",
+            "tracksNum": 73,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "挑选了适合在夜晚放松聆听的舒缓乐曲。※乐曲的顺序每天都会变化。",
+            "id": "56694128-6164-4700-8098-996e6edf421f",
+            "name": "夜晚时光",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/3fcc978d-45ee-42c3-b7bf-f4f6c8c72b8f",
+            "tracksNum": 33,
+            "type": "MULTIPLE"
+        }
+    ],
+    "从游戏中的场景开始":[
+        {
+            "description": "※乐曲的顺序每天都会变化。",
+            "id": "4f3cdaff-c0ba-4381-bd24-d85e1783a26f",
+            "name": "占地对战/祭典比赛",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/edda3b54-2344-4492-9b9c-be80b7ff9752",
+            "tracksNum": 47,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "※乐曲的顺序每天都会变化。",
+            "id": "06762d62-e64f-4381-a376-d0159bc6ef96",
+            "name": "最终决战",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/ece9dad7-39f7-4dad-9c47-d3ea80455804",
+            "tracksNum": 57,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "※乐曲的顺序每天都会变化。",
+            "id": "d97df2ef-5fba-4df0-8671-0f7928aa9ef2",
+            "name": "冒险的开始",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/4ce4ec9a-68c9-4ba5-b414-7937ce8b0e36",
+            "tracksNum": 48,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "※乐曲的顺序每天都会变化。",
+            "id": "d49dacd0-93f8-44df-b39f-166cebf66d30",
+            "name": "强敌",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/1b71326d-4d9b-46ed-8ff1-18ef4019f4c1",
+            "tracksNum": 50,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "※乐曲的顺序每天都会变化。",
+            "id": "00bf5df6-d1bb-4201-ae38-03d06cd7c183",
+            "name": "标题画面",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/6da53205-bcb3-483a-9a3e-5bd875e35e2f",
+            "tracksNum": 64,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "※乐曲的顺序每天都会变化。",
+            "id": "5a302615-885e-4f4a-8c44-9cf454d58381",
+            "name": "制作人员名单",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/889b90ad-50f7-4a21-ad64-7beaf7d67959",
+            "tracksNum": 72,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "※乐曲的顺序每天都会变化。",
+            "id": "84ee8365-7ea7-4cef-8702-1c9cfcd43838",
+            "name": "Win!",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/6abbeca6-1a26-4345-a3f8-4b58fe449cfc",
+            "tracksNum": 153,
+            "type": "MULTIPLE"
+        }
+    ]
+}

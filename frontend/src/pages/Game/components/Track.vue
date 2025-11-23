@@ -1,6 +1,6 @@
 <template>
   <section :hidden="hidden">
-    <div class="radio-group">
+    <div class="radio-group" :hidden="!isShowFilter">
       <label
         v-for="(label, key) in TrackMode"
         :key="key"
@@ -59,6 +59,7 @@ import { getLangTitle, isShowTitle, openSourceImg } from '@/utils/data-utils';
 
 const props = defineProps<{
   hidden: boolean;
+  isShowFilter: boolean;
   data: Track[];
   imgMap: Map<string, Map<string, string>>;
 }>();

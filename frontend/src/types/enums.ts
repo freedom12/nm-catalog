@@ -7,8 +7,8 @@ export type GameGroupBy = keyof typeof GameGroupBy;
 
 export const GameDataSection = {
   TRACK: 'Tracks',
-  RELATED: 'Related Games',
   PLAYLIST: 'Playlists',
+  RELATED: 'Related Games',
 };
 export type GameDataSection = keyof typeof GameDataSection;
 
@@ -28,3 +28,16 @@ export const TrackMode = {
   LOOP: 'Extendable',
 };
 export type TrackMode = keyof typeof TrackMode;
+
+export const LangCode = {
+  de_DE: 'de-DE',
+  en_US: 'en-US',
+  es_ES: 'es-ES',
+  fr_FR: 'fr-FR',
+  it_IT: 'it-IT',
+  ja_JP: 'ja-JP',
+  ko_KR: 'ko-KR',
+  zh_CN: 'zh-CN',
+  zh_TW: 'zh-TW',
+};
+export type LangCode = keyof typeof LangCode;
