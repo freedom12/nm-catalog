@@ -28,9 +28,12 @@
           />
         </div>
         <div>
-          <h4>
-            {{ track.idx }}. {{ getLangTitle(track, store.mainLang) }}
-            <small>({{ track.duration }})</small>
+          <h4 class="prefix-text">
+            {{ track.idx }}.&nbsp;
+            <span>
+              {{ getLangTitle(track, store.mainLang) }}
+              <small>({{ track.duration }})</small>
+            </span>
             <div class="tag">
               <SvgIcon type="star" :class="{ active: track.isbest }"></SvgIcon>
               <SvgIcon type="repeat" :class="{ active: track.isloop }"></SvgIcon>
@@ -40,6 +43,7 @@
             <li
               v-for="lang of store.langList.filter((x) => isShowTitle(track, x.id))"
               :key="lang.id"
+              class="prefix-text"
             >
               <b>{{ lang.id }}</b> {{ getLangTitle(track, lang.id) }}
             </li>

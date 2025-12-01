@@ -8,6 +8,6 @@ export interface GameGroup {
 export interface GameDetail {
   game: Game;
   tracks: Track[];
-  relateds: Game[];
   playlists: Playlist[];
+  relateds: Game[];
 }

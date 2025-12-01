@@ -1,9 +1,21 @@
 const db = require('../db');
-const [lang, hardware, game, track, game_related] = [
+const [
+  lang,
+  hardware,
+  game,
+  track,
+  playlist,
+  playlist_game,
+  playlist_track,
+  game_related,
+] = [
   require('./schema/lang'),
   require('./schema/hardware'),
   require('./schema/game'),
   require('./schema/track'),
+  require('./schema/playlist'),
+  require('./schema/playlist_game'),
+  require('./schema/playlist_track'),
   require('./schema/game_related'),
 ];
 
@@ -12,6 +24,9 @@ const statements = {
   hardware: prepareGroup(db, hardware),
   game: prepareGroup(db, game),
   track: prepareGroup(db, track),
+  playlist: prepareGroup(db, playlist),
+  playlist_game: prepareGroup(db, playlist_game),
+  playlist_track: prepareGroup(db, playlist_track),
   game_related: prepareGroup(db, game_related),
   sql: (sql) => db.prepare(sql),
 };

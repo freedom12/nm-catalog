@@ -139,7 +139,7 @@ router.get('/release', async (_, res) => {
 router.get('/:id/detail', async (req, res) => {
   const id = req.params.id;
   try {
-    const [game, tracks, relates] = await Promise.all([
+    const [game, tracks, playlist, relates] = await Promise.all([
       new Promise((resolve, reject) => {
         try {
           const result = stmt.game.selectById.all(id)[0];
@@ -154,6 +154,16 @@ router.get('/:id/detail', async (req, res) => {
         try {
           const gid = stmt.game.selectEntityById.all(id)[0].id;
           const result = stmt.track.selectByGid.all(gid);
+          resolve(result);
+        } catch (err) {
+          reject(err);
+        }
+      }),
+
+      new Promise((resolve, reject) => {
+        try {
+          const gid = stmt.game.selectEntityById.all(id)[0].id;
+          const result = stmt.playlist.selectByGid.all(gid);
           resolve(result);
         } catch (err) {
           reject(err);
@@ -195,6 +205,7 @@ router.get('/:id/detail', async (req, res) => {
     const result = {
       game: game,
       tracks: tracks,
+      playlist: playlist,
       relateds: relates,
     };
     res.json(result);

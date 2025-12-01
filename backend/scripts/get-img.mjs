@@ -1,5 +1,5 @@
 /*
-  Download images
+  Download images (run both [pull-game] and [pull-playlist] first)
   
   -- original    # also download original images
   -- error       # download images of previous error tasks
@@ -15,6 +15,8 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import rw from '../utils/rw.js';
 import stmt from '../db/statements.js';
+import tools from '../utils/tools.js';
+const { info } = tools;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,23 +27,31 @@ const isDownloadError = args.includes('error');
 const prodDir = args.find((x) => x.startsWith('--dir='))?.split('=')[1];
 
 let langs = stmt.lang.select.all().map((x) => x.id);
-const targetLang = langs.filter((x) => args.includes(x));
-if (!targetLang.length) {
+const targetLangs = langs.filter((x) => args.includes(x));
+if (!targetLangs.length) {
   const enIdx = langs.indexOf('en-US');
   [langs[0], langs[enIdx]] = [langs[enIdx], langs[0]];
 } else {
-  langs = targetLang;
+  langs = targetLangs;
 }
 
-const gameIds = rw.readText('new_game.json').slice(1, -1).replace(/"/g, `'`);
+const sGameIds = rw.readText('new_game.json').slice(1, -1).replace(/"/g, `'`);
 const tasks = [];
+const sPalylistIds = JSON.parse(rw.readText('updated-playlist.json'))
+  .playlistIds.map((x) => `'${x}'`)
+  .join(',');
+
 for (const lang of langs) {
   let imgIds = [];
 
   if (!isDownloadError) {
     const langStr = lang.replace('-', '_');
     const diff = lang.includes('en') ? '' : `and img_${langStr} <> img_en_US`;
-    const sql = `select img_${langStr} from game where id in (${gameIds}) ${diff} union select img_${langStr} from track where gid in (${gameIds}) ${diff}`;
+    const sql = `
+        select img_${langStr} from game where id in (${sGameIds}) ${diff} 
+        union select img_${langStr} from track where gid in (${sGameIds}) ${diff}
+        union select img_${langStr} from playlist where id in (${sPalylistIds}) ${diff}
+      `;
     imgIds = stmt
       .sql(sql)
       .all()
@@ -71,7 +81,7 @@ for (const lang of langs) {
 
 const host = 'https://image-assets.m.nintendo.com';
 const sum = tasks.map((x) => x.imgIds.length).reduce((a, b) => a + b, 0);
-console.log('\x1b[32m%s\x1b[0m', `To download ${sum} image(s).`);
+info(`To download ${sum} image(s).`);
 
 async function processImage(imgId, index, task) {
   try {
@@ -109,7 +119,7 @@ async function run(task) {
     msg += `, with ${task.errors.length} errors`;
   }
   msg += '.';
-  console.log('\x1b[33m%s\x1b[0m', msg);
+  info(msg);
 }
 
 async function runAll() {

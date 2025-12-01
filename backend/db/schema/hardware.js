@@ -19,5 +19,6 @@ module.exports = {
     ['Nintendo 3DS', 2011],
     ['Wii U', 2012],
     ['Nintendo Switch', 2017],
+    ['Nintendo Switch 2', 2025],
   ],
 };

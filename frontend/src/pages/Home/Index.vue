@@ -7,79 +7,86 @@
       </option>
     </select>
   </div>
-  <div class="loading" v-if="loading"></div>
-  <main v-else>
-    <section
-      class="group"
-      v-for="(group, i) in gameGroups"
-      :key="group.name"
-      :ref="
+  <Container :loading="loading">
+    <main>
+      <section
+        class="group"
+        v-for="(group, i) in gameGroups"
+        :key="group.name"
+        :ref="
         (el) => {
           if (el) {groupRefs[i] = el as HTMLElement};
         }
       "
-    >
-      <h3>{{ group.name }}</h3>
-      <ul class="game">
-        <li class="card" v-for="game in group.games" :key="game.id">
-          <img
-            :src="gameImgMap?.get(store.mainLang)?.get(game.id)"
-            @click.stop="route.push(`/game/${game.id}`)"
-            loading="lazy"
-          />
-          <router-link :to="`/game/${game.id}`" :title="getLangTitle(game, store.mainLang)">
-            {{ getLangTitle(game, store.mainLang) }}
-          </router-link>
-        </li>
-      </ul>
-    </section>
-    <SideNav
-      :target="groupRefs"
-      :options="gameGroups.map((x) => x.name.toString())"
-      :gap="groupBy === 'RELEASE' ? 5 : 1"
-      v-model:title="currentGroup"
-      v-if="gameGroups.length"
-    >
-      <div id="sort-select">
-        <span> <SvgIcon type="category" width="24px"></SvgIcon> </span>
-        <div>
-          <ul>
-            <li
-              v-for="(label, key) in GameGroupBy"
-              :key="key"
-              :class="{ active: groupBy === key }"
-              @click.stop="changeGroupBy(key)"
+      >
+        <h3>{{ group.name }}</h3>
+        <ul class="game">
+          <li class="card" v-for="game in group.games" :key="game.id">
+            <img
+              :src="gameImgMap?.get(store.mainLang)?.get(game.id)"
+              @click.stop="route.push(`/game/${game.id}`)"
+              loading="lazy"
+            />
+            <router-link
+              :to="`/game/${game.id}`"
+              :title="getLangTitle(game, store.mainLang)"
             >
-              <span>{{ label }}</span>
-            </li>
-          </ul>
+              {{ getLangTitle(game, store.mainLang) }}
+            </router-link>
+          </li>
+        </ul>
+      </section>
+      <SideNav
+        :target="groupRefs"
+        :options="gameGroups.map((x) => x.name.toString())"
+        :gap="groupBy === 'RELEASE' ? 5 : 1"
+        v-model:title="currentGroup"
+        v-if="gameGroups.length"
+      >
+        <div id="sort-select">
+          <span> <SvgIcon type="category" width="24px"></SvgIcon> </span>
+          <div>
+            <ul>
+              <li
+                v-for="(label, key) in GameGroupBy"
+                :key="key"
+                :class="{ active: groupBy === key }"
+                @click.stop="changeGroupBy(key)"
+              >
+                <span>{{ label }}</span>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-    </SideNav>
-  </main>
+      </SideNav>
+    </main>
+  </Container>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import axios from 'axios';
 import { useRouter } from 'vue-router';
 import { useStore } from '@/stores';
+import { useRequest } from '@/composables/useRequest';
 import Header from '@/components/Header.vue';
+import Container from '@/components/Container.vue';
 import SideNav from '@/components/SideNav';
 import SvgIcon from '@/components/SvgIcon.vue';
 import { GameGroupBy, type GameGroup } from '@/types';
+import { getGames } from '@/api';
 import { getLangTitle, getImgSrc } from '@/utils/data-utils';
 
 defineOptions({ name: 'Home' });
 
 const route = useRouter();
 const store = useStore();
+const { loading, request } = useRequest();
 const gameDict: {
-  [key in GameGroupBy]: { url: string; content: GameGroup[] };
+  [key in GameGroupBy]: { key: 'hardware' | 'release' | 'recent'; content: GameGroup[] };
 } = {
-  PLATFORM: { url: '/api/game/hardware', content: [] },
-  RELEASE: { url: '/api/game/release', content: [] },
-  ADDED: { url: '/api/game/recent', content: [] },
+  PLATFORM: { key: 'hardware', content: [] },
+  RELEASE: { key: 'release', content: [] },
+  ADDED: { key: 'recent', content: [] },
 };
 const groupBy = ref<GameGroupBy>('PLATFORM');
 const gameGroups = ref<GameGroup[]>([]);
@@ -87,7 +94,6 @@ const currentGroup = ref<string>();
 const gameImgMap = ref<Map<string, Map<string, string>>>(
   new Map<string, Map<string, string>>()
 );
-const loading = ref<boolean>(false);
 const selectRef = ref<HTMLElement>();
 const groupRefs = ref<HTMLElement[]>([]);
 
@@ -112,16 +118,7 @@ async function getGamesByGroup(groupBy: GameGroupBy): Promise<GameGroup[]> {
     return target.content;
   }
 
-  let result = [];
-  try {
-    loading.value = true;
-    const res = await axios.get(target.url);
-    result = res.data;
-  } catch (err) {
-    console.error(err);
-  } finally {
-    loading.value = false;
-  }
+  const result = await request(getGames(target.key));
   target.content = result;
   return result;
 }

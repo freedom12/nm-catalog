@@ -2,6 +2,7 @@ const excel = require('./excel');
 const stmt = require('../db/statements');
 const { getTransactionByStatement } = require('../db/transaction');
 const rw = require('./rw');
+const { info } = require('../utils/tools.js');
 
 /**
  * Import data from .xlsx
@@ -28,10 +29,7 @@ const importdata = (files, settings, db = require('../db')) => {
     .filter((row) => !existedGameIds.includes(row.id))
     .map((row) => row.id);
 
-  console.log(
-    '\x1b[32m%s\x1b[0m',
-    `+++++++++ ${newGameIds.length} new game(s) found. +++++++++`
-  );
+  info(`+++++++++ ${newGameIds.length} new game(s) found. +++++++++`);
 
   sources.forEach((workbook, i) => {
     const lang = ((fileName) => {
@@ -102,7 +100,8 @@ const importdata = (files, settings, db = require('../db')) => {
     });
 
     if (i === sources.length - 1) {
-      console.log('\x1b[32m%s\x1b[0m', `Updating related data...`);
+      info(`Updating related data...`);
+
       stmt.game_related.delete.run();
       relateData.push(
         ...workbook[0]

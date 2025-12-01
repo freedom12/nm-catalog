@@ -1,15 +1,17 @@
 /*
-  Pull data from Nintendo APIs
+  Pull data of games & tracks from Nintendo APIs
   
   -- full       # full update
-  -- only-game  # only update games (no tracks)
+  -- no-track   # only update game data
+  -- (gid)      # update specific games (usually to add additional tracks)
 */
 
-import axios from 'axios';
 import pLimit from 'p-limit';
 import stmt from '../db/statements.js';
 import { getTransactionByStatement } from '../db/transaction.js';
 import rw from '../utils/rw.js';
+import tools from '../utils/tools.js';
+const { request, info } = tools;
 
 const args = process.argv.slice(2);
 const isUpdateSpecific =
@@ -19,7 +21,7 @@ const isUpdateSpecific =
     )
   ).length > 0;
 const isFullUpdate = args.includes('full');
-const isOnlyGame = args.includes('only-game');
+const isNoTrack = args.includes('no-track');
 
 const ms = Date.now();
 const langs = stmt.lang.select.all().map((x) => x.id);
@@ -47,7 +49,7 @@ const existedGameIds = stmt.game.select.all().map((x) => x.id);
     if (gameWithYears.length > 0) {
       gameWithYears = gameWithYears.reduce((a, b) => [...a, ...b]);
     } else {
-      console.log('\x1b[32m%s\x1b[0m', `+++++++++ No new game found. +++++++++`);
+      info(`+++++++++ No new game found. +++++++++`);
       return;
     }
 
@@ -61,7 +63,11 @@ const existedGameIds = stmt.game.select.all().map((x) => x.id);
               [x]: games
                 .reverse()
                 .filter((y) =>
-                  !isUpdateSpecific ? !existedGameIds.includes(y.id) : args.includes(y.id)
+                  isFullUpdate
+                    ? true
+                    : !isUpdateSpecific
+                    ? !existedGameIds.includes(y.id)
+                    : args.includes(y.id)
                 ),
             };
           })
@@ -69,21 +75,35 @@ const existedGameIds = stmt.game.select.all().map((x) => x.id);
       )
     ).reduce((a, b) => Object.assign(a, b));
 
+    const games = gamesByLang[langs[0]];
+    if (games.length === 1 && games[0].isGameLink) {
+      info(`Can not update only one linked game.`);
+      return;
+    }
+
     const msg = isFullUpdate
       ? `${gameWithYears.length} games found.`
       : !isUpdateSpecific
-      ? `${gamesByLang[langs[0]].length} new game(s) found.`
-      : `${gamesByLang[langs[0]].length} game(s) to update.`;
-    console.log('\x1b[32m%s\x1b[0m', `+++++++++ ${msg} +++++++++`);
+      ? `${games.length} new game(s) found.`
+      : `${games.length} game(s) to update.`;
+    info(`+++++++++ ${msg} +++++++++`);
 
     let playlistInfos = [];
-    if (!isOnlyGame) {
+    if (!isNoTrack) {
       playlistInfos = (
-        await Promise.all(gamesByLang[langs[0]].map((x) => getGamePlayListInfo(x.id)))
-      ).map((x) => ({
-        allPlaylistId: x.allPlaylist.id,
-        bestTrackIds: x.bestPlaylist.tracks.map((y) => y.id),
-      }));
+        await Promise.all(
+          games.map((x) =>
+            !x.isGameLink ? getGamePlaylistInfo(x.id) : Promise.resolve(undefined)
+          )
+        )
+      ).map((x) =>
+        !x
+          ? {}
+          : {
+              allPlaylistId: x.allPlaylist.id,
+              bestTrackIds: x.bestPlaylist.tracks.map((y) => y.id),
+            }
+      );
     }
 
     if (isFullUpdate) {
@@ -91,7 +111,7 @@ const existedGameIds = stmt.game.select.all().map((x) => x.id);
     }
     if (isUpdateSpecific) {
       gamesByLang[Object.keys(gamesByLang)[0]].forEach((x) => {
-        stmt.game.deleteByGid.run(x.id);
+        stmt.track.deleteByGid.run(x.id);
       });
     }
     for (const [lang, games] of Object.entries(gamesByLang)) {
@@ -106,7 +126,7 @@ const existedGameIds = stmt.game.select.all().map((x) => x.id);
       ]);
 
       const trackData = [];
-      if (!isOnlyGame) {
+      if (!isNoTrack) {
         for (let i = 0; i < games.length; i++) {
           const game = games[i];
           if (!game.isGameLink) {
@@ -144,14 +164,17 @@ const existedGameIds = stmt.game.select.all().map((x) => x.id);
       [...relateDataSet].map((x) => x.split('+'))
     );
 
-    console.log('Data successfully pulled.');
+    info(`Game data successfully pulled.`);
 
-    rw.writeText(
-      'new_game.json',
-      gamesByLang[langs[0]].map((x) => x.id)
-    );
+    if (!isFullUpdate) {
+      rw.writeText(
+        'new_game.json',
+        games.map((x) => x.id)
+      );
+    }
     rw.writeText('res-platform.json', '');
     rw.writeText('res-year.json', '');
+    rw.writeText('updated-playlist.json', '{}');
   } catch (err) {
     console.error(err);
     process.exit(1);
@@ -159,38 +182,33 @@ const existedGameIds = stmt.game.select.all().map((x) => x.id);
 })();
 
 async function getGamesByAdded(lang) {
-  const res = await axios.get(
+  return await request(
     `https://api.m.nintendo.com/catalog/games:all?country=JP&lang=${lang}&sortRule=RECENT`
   );
-  return res.data;
 }
 
 async function getGamesByYear(lang) {
-  const res = await axios.get(
+  return await request(
     `https://api.m.nintendo.com/catalog/gameGroups?country=JP&groupingPolicy=RELEASEDAT&lang=${lang}`
   );
-  return res.data;
 }
 
-async function getGamePlayListInfo(gameId) {
-  const res = await axios.get(
-    `https://api.m.nintendo.com/catalog/games/${gameId}/relatedPlaylists?country=JP&lang=zh-CN&membership=BASIC&packageType=hls_cbcs&sdkVersion=ios-1.4.0_f362763-1`
+async function getGamePlaylistInfo(gameId) {
+  return await request(
+    `https://api.m.nintendo.com/catalog/games/${gameId}/relatedPlaylists?country=JP&lang=zh-CN`
   );
-  return res.data;
 }
 
 async function getTracksByGame(playlistId, lang) {
-  const res = await axios.get(
-    `https://api.m.nintendo.com/catalog/officialPlaylists/${playlistId}?country=JP&lang=${lang}&membership=BASIC&packageType=hls_cbcs&sdkVersion=ios-1.4.0_f362763-1`
+  return await request(
+    `https://api.m.nintendo.com/catalog/officialPlaylists/${playlistId}?country=JP&lang=${lang}`
   );
-  return res.data;
 }
 
 async function getRelateByGame(gameId) {
-  const res = await axios.get(
+  return await request(
     `https://api.m.nintendo.com/catalog/games/${gameId}/relatedGames?country=JP&lang=zh-CN`
   );
-  return res.data;
 }
 
 function getDuration(ms) {
