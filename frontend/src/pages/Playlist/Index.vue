@@ -8,7 +8,7 @@
         <div>
           <h2 ref="titleRef">
             {{ getLangTitle(data.playlist, store.mainLang) }}<br />
-            <small>{{ getPlaylistTypeDesc(data.playlist.type) }} · {{ data.tracks.length }}首 · {{ getTotalDuration(data.tracks) }}</small><br />
+            <small>{{ getPlaylistTypeDesc(data.playlist.type) }} · {{ data.playlist.tracksnum }}首 · {{ getTotalDuration(data.tracks) }}</small><br />
             <small>{{ getLangDesc(data.playlist, store.mainLang) }}</small>
           </h2>
         </div>
