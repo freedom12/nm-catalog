@@ -1,7 +1,7 @@
 <template>
   <section :hidden="hidden">
     <div class="group" v-for="group in groupedPlaylists" :key="group.type">
-      <h3 class="group-title">{{ getPlaylistTypeLabel(group.type) }}</h3>
+      <h3 class="group-title">{{ group.type }}</h3>
       <ul class="playlist">
         <li v-for="playlist in group.playlists" :key="playlist.id">
           <PlaylistCard :playlist="playlist" />
@@ -27,7 +27,7 @@ const groupedPlaylists = computed(() => {
   const groups = new Map<string, Playlist[]>();
 
   props.data.forEach(playlist => {
-    const type = playlist.type;
+    const type = getPlaylistTypeLabel(playlist.type);
     if (!groups.has(type)) {
       groups.set(type, []);
     }
@@ -42,14 +42,12 @@ const groupedPlaylists = computed(() => {
 
 function getPlaylistTypeLabel(playlistType: string): string {
   switch (playlistType) {
-    case PlaylistType.LOOP:
-      return '可更改时长的播放列表';
     case PlaylistType.MULTIPLE:
       return '包含系列游戏的播放列表';
     case PlaylistType.SINGLE_GAME:
       return '包含单独游戏的播放列表';
     default:
-      return playlistType;
+      return '';
   }
 }
 </script>

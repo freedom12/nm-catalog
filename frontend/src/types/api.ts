@@ -11,3 +11,9 @@ export interface GameDetail {
   playlists: Playlist[];
   relateds: Game[];
 }
+
+export interface PlaylistDetail {
+  playlist: Playlist;
+  tracks: Track[];
+  game?: Game;
+}

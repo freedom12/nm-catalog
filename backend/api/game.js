@@ -139,7 +139,7 @@ router.get('/release', async (_, res) => {
 router.get('/:id/detail', async (req, res) => {
   const id = req.params.id;
   try {
-    const [game, tracks, playlist, relates] = await Promise.all([
+    const [game, tracks, playlists, relates] = await Promise.all([
       new Promise((resolve, reject) => {
         try {
           const result = stmt.game.selectById.all(id)[0];
@@ -205,7 +205,7 @@ router.get('/:id/detail', async (req, res) => {
     const result = {
       game: game,
       tracks: tracks,
-      playlist: playlist,
+      playlists: playlists,
       relateds: relates,
     };
     res.json(result);

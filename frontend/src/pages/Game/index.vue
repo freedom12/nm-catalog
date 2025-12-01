@@ -65,7 +65,6 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { useStore } from '@/stores';
 import { useRequest } from '@/composables/useRequest';
@@ -128,61 +127,6 @@ async function getDetail() {
     for (const game of data.value.relateds) {
       imgMap?.set(game.id, getImgSrc(game, lang.id));
     }
-  }
-
-  tempGetPlaylist();
-}
-
-async function tempGetPlaylist() {
-  if (!data.value) {
-    return;
-  }
-
-  // 临时用代理接口获取播放列表数据，当前切换语言时不会刷新
-  data.value.playlists = [];
-  const playlistRes = await axios.get(`/api/proxy/nm/game/${gid}/playlists`, {
-    params: {
-      lang: store.mainLang,
-    },
-  });
-  if (
-    !playlistRes.data ||
-    !playlistRes.data.miscPlaylistSet ||
-    !playlistRes.data.miscPlaylistSet.officialPlaylists
-  ) {
-    return;
-  }
-  for (const playlist of playlistRes.data.miscPlaylistSet.officialPlaylists) {
-    const name = playlist.name;
-    const img = playlist.thumbnailURL.split('/').pop()?.split('.').shift();
-    // const type = playlist.type;
-    // if (type !== 'SINGLE_GAME' && type !== 'MULTIPLE') {
-    //   continue;
-    // }
-    data.value.playlists.push({
-      id: playlist.id,
-      type: playlist.type,
-      tracksNum: playlist.tracksNum,
-      isRelatedGame: 1,
-      title_de_DE: name,
-      title_en_US: name,
-      title_es_ES: name,
-      title_fr_FR: name,
-      title_it_IT: name,
-      title_ja_JP: name,
-      title_ko_KR: name,
-      title_zh_CN: name,
-      title_zh_TW: name,
-      img_de_DE: img,
-      img_en_US: img,
-      img_es_ES: img,
-      img_fr_FR: img,
-      img_it_IT: img,
-      img_ja_JP: img,
-      img_ko_KR: img,
-      img_zh_CN: img,
-      img_zh_TW: img,
-    });
   }
 
   for (const lang of store.langList) {

@@ -18,11 +18,11 @@ export class LocalizationString {
         prefix = prefix && !prefix.endsWith('_') ? `${prefix}_` : prefix;
         suffix = suffix && !suffix.startsWith('_') ? `_${suffix}` : suffix;
       }
-      const key = `${prefix}${langCode}${suffix}`;
+      const key = `${prefix}${this.convertLangCode(langCode)}${suffix}`;
       if (!(key in data)) {
         continue;
       }
-      this.localizationMap[langCode] = data[key];
+      this.localizationMap[this.convertLangCode(langCode)] = data[key];
     }
   }
 
@@ -95,13 +95,13 @@ export interface Track extends MultiLangField<'title'>, MultiLangField<'img'> {
   isbest: number;
 }
 
-export interface Playlist extends MultiLangField<'title'>, MultiLangField<'img'> {
+export interface Playlist extends MultiLangField<'title'>, MultiLangField<'img'>, MultiLangField<'desc'> {
   id: string;
   type: PlaylistType;
   tracksNum: number;
   isRelatedGame: number;
-  desc?: LocalizationString; //type为MULTIPLE/SPECIAL/LOOP时可能存在
-  gid?: string; //type为SINGLE_GAME_ALL/SINGLE_GAME/LOOP/BEST时存在
+  // desc?: LocalizationString; //type为MULTIPLE/SPECIAL/LOOP时可能存在
+  // gid?: string; //type为SINGLE_GAME_ALL/SINGLE_GAME/LOOP/BEST时存在
 }
 
 export interface Lang {
