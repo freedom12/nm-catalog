@@ -54,7 +54,7 @@ let hasError = false;
           x.id,
           x.type,
           1,
-          x.tracksnum ?? x.tracks.length,
+          x.tracksNum ?? x.tracks.length,
           x.name,
           x.thumbnailURL.split('/').reverse()[0],
           x.description || '',
