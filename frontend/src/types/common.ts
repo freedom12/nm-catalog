@@ -98,7 +98,7 @@ export interface Track extends MultiLangField<'title'>, MultiLangField<'img'> {
 export interface Playlist extends MultiLangField<'title'>, MultiLangField<'img'>, MultiLangField<'desc'> {
   id: string;
   type: PlaylistType;
-  tracksNum: number;
+  tracksnum: number;
   isRelatedGame: number;
   // desc?: LocalizationString; //type为MULTIPLE/SPECIAL/LOOP时可能存在
   // gid?: string; //type为SINGLE_GAME_ALL/SINGLE_GAME/LOOP/BEST时存在

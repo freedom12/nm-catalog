@@ -12,7 +12,7 @@
     </div>
     <ol>
       <li
-        v-for="track in data"
+        v-for="(track, index) in data"
         :key="track.idx"
         :class="{
           hidden:
@@ -29,7 +29,7 @@
         </div>
         <div>
           <h4 class="prefix-text">
-            {{ track.idx }}.&nbsp;
+            {{ index + 1 }}.&nbsp;
             <span>
               {{ getLangTitle(track, store.mainLang) }}
               <small>({{ track.duration }})</small>

@@ -4,7 +4,7 @@
   <main id="main" v-else>
     <div class="group" v-for="[name, section] in Object.entries(sections)" :key="name">
       <h3 class="group-title">{{ name }}</h3>
-      <ul class="playlist">     
+      <ul class="playlist">
         <li v-for="playlist in section" :key="playlist.id">
           <PlaylistCard :playlist="playlist" />
         </li>
@@ -16,9 +16,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import Header from '@/components/Header.vue';
-import { LocalizationString, PlaylistType, type Playlist } from '@/types';
+import { PlaylistType, type Playlist } from '@/types';
 import PlaylistCard from '@/components/PlaylistCard.vue';
-import { useStore } from '@/stores';
 
 const loading = ref<boolean>(false);
 const sections = ref<Record<string, Playlist[]>>({});
@@ -29,11 +28,12 @@ onMounted(async () => {
   for (const [sectionName, sectionPlaylists] of Object.entries(playlistSectionData)) {
     const playlists: Playlist[] = (sectionPlaylists as any[]).map((playlistData: any) => {
       const name = playlistData.name;
+      const desc = playlistData.description;
       const img = playlistData.thumbnailURL.split('/').pop()?.split('.').shift();
       const playlist: Playlist = {
         id: playlistData.id,
         type: playlistData.type as PlaylistType,
-        tracksNum: playlistData.tracksNum,
+        tracksnum: playlistData.tracksNum,
         isRelatedGame: 0,
         title_de_DE: name,
         title_en_US: name,
@@ -49,16 +49,20 @@ onMounted(async () => {
         img_es_ES: img,
         img_fr_FR: img,
         img_it_IT: img,
-        img_ja_IP: img,
+        img_ja_JP: img,
         img_ko_KR: img,
         img_zh_CN: img,
         img_zh_TW: img,
+        desc_de_DE: desc,
+        desc_en_US: desc,
+        desc_es_ES: desc,
+        desc_fr_FR: desc,
+        desc_it_IT: desc,
+        desc_ja_JP: desc,
+        desc_ko_KR: desc,
+        desc_zh_CN: desc,
+        desc_zh_TW: desc,
       };
-      if (playlistData.description) {
-        const desc = new LocalizationString();
-        desc.set(useStore().mainLang, playlistData.description);
-        playlist.desc = desc;
-      }
       return playlist;
     });
     sections.value[sectionName] = playlists;
