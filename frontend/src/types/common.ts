@@ -4,16 +4,18 @@ export type MultiLangField<Name extends string> = {
   [key in `${Name}_${LangCode}`]: string;
 };
 
-export interface Game extends MultiLangField<'title'>, MultiLangField<'img'> {
+export interface MultiLangVisualEntity extends MultiLangField<'title'>, MultiLangField<'img'> {
   id: string;
+}
+
+export interface Game extends MultiLangVisualEntity {
   year: number;
   hardware: string;
   link: string;
   inserted: number;
 }
 
-export interface Track extends MultiLangField<'title'>, MultiLangField<'img'> {
-  id: string;
+export interface Track extends MultiLangVisualEntity {
   gid?: string;
   idx: number;
   duration: string;
@@ -22,16 +24,14 @@ export interface Track extends MultiLangField<'title'>, MultiLangField<'img'> {
 }
 
 export interface Playlist
-  extends MultiLangField<'title'>,
-    MultiLangField<'img'>,
-    MultiLangField<'desc'> {
-  id: string;
+  extends MultiLangVisualEntity, MultiLangField<'desc'> {
   type: PlaylistType;
   tracksnum: number;
   isrelatedgame: number;
 }
 
-export type NMData = Game | Track | Playlist;
+// export type NMData = Game | Track | Playlist;
+export type NMData = MultiLangVisualEntity;
 
 // export interface Lang {
 //   id: string;
