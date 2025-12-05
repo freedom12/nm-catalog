@@ -3,13 +3,13 @@ import { ref } from 'vue';
 export const useRequest = () => {
   const loading = ref(false);
 
-  const request = async (promise: Promise<any>): Promise<any> => {
+  const request = async <T>(promise: Promise<T>): Promise<T> => {
     loading.value = true;
     try {
-      const res = await promise;
-      return res.data;
+      return await promise;
     } catch (err) {
       console.error(err);
+      throw err;
     } finally {
       loading.value = false;
     }

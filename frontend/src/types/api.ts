@@ -14,6 +14,6 @@ export interface GameDetail {
 
 export interface PlaylistDetail {
   playlist: Playlist;
+  games?: Game[];
   tracks: Track[];
-  game?: Game;
 }

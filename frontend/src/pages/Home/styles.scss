@@ -24,25 +24,27 @@
       margin: calc($gap / 2);
       border-radius: 8px;
 
-      > img {
-        display: block;
-        width: 200px;
-        height: 200px;
-        margin-bottom: 8px;
-        border-radius: 8px;
-        cursor: pointer;
-      }
-
       > a {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 3;
-        overflow: hidden;
-        font-size: 1.1rem;
-        text-overflow: ellipsis;
-        word-break: break-word;
-        max-height: calc(1.1rem * 3 * 1.5);
-        cursor: pointer;
+        > img {
+          display: block;
+          width: 200px;
+          height: 200px;
+          margin-bottom: 8px;
+          border-radius: 8px;
+          cursor: pointer;
+        }
+
+        > span {
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 3;
+          overflow: hidden;
+          font-size: 1.1rem;
+          text-overflow: ellipsis;
+          word-break: break-word;
+          max-height: calc(1.1rem * 3 * 1.5);
+          cursor: pointer;
+        }
       }
     }
   }
@@ -165,29 +167,32 @@
       display: block;
 
       .card {
-        display: flex;
-        align-items: center;
         width: 100%;
         height: 50px;
         text-align: left;
 
-        > img {
-          display: inline-block;
-          width: 50px;
-          height: 50px;
-          margin-bottom: 8px;
-          border-radius: 8px;
-          cursor: pointer;
-        }
+        > a {
+          display: flex;
+          align-items: center;
+          
+          > img {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+          }
 
-        a {
-          flex: 1;
-          display: block;
-          margin: 0 1rem 0.5rem;
-          font-size: 0.9rem;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          > span {
+            flex: 1;
+            display: block;
+            margin: 0 1rem 0.5rem;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
         }
       }
     }

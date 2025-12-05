@@ -11,7 +11,7 @@
     <main>
       <section
         class="group"
-        v-for="(group, i) in gameGroups"
+        v-for="(group, i) in computedGameGroups"
         :key="group.name"
         :ref="
         (el) => {
@@ -22,26 +22,19 @@
         <h3>{{ group.name }}</h3>
         <ul class="game">
           <li class="card" v-for="game in group.games" :key="game.id">
-            <img
-              :src="gameImgMap?.get(store.mainLang)?.get(game.id)"
-              @click.stop="route.push(`/game/${game.id}`)"
-              loading="lazy"
-            />
-            <router-link
-              :to="`/game/${game.id}`"
-              :title="getLangTitle(game, store.mainLang)"
-            >
-              {{ getLangTitle(game, store.mainLang) }}
+            <router-link :to="`/game/${game.id}`" :title="game.$title">
+              <img :src="game.$imgPath" loading="lazy" />
+              <span>{{ game.$title }}</span>
             </router-link>
           </li>
         </ul>
       </section>
       <SideNav
         :target="groupRefs"
-        :options="gameGroups.map((x) => x.name.toString())"
-        :gap="groupBy === 'RELEASE' ? 5 : 1"
+        :options="computedGroupNames"
+        :step="groupBy === 'RELEASE' ? 5 : 1"
         v-model:title="currentGroup"
-        v-if="gameGroups.length"
+        v-if="computedGameGroups.length"
       >
         <div id="sort-select">
           <span> <SvgIcon type="category" width="24px"></SvgIcon> </span>
@@ -64,23 +57,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useStore } from '@/stores';
+import { computed, onMounted, ref } from 'vue';
 import { useRequest } from '@/composables/useRequest';
+import { useImgMap } from '@/composables/useImgMap';
+import { useLocalizationString } from '@/composables/useLocalizationString';
 import Header from '@/components/Header.vue';
 import Container from '@/components/Container.vue';
 import SideNav from '@/components/SideNav';
 import SvgIcon from '@/components/SvgIcon.vue';
 import { GameGroupBy, type GameGroup } from '@/types';
 import { getGames } from '@/api';
-import { getLangTitle, getImgSrc } from '@/utils/data-utils';
 
 defineOptions({ name: 'Home' });
 
-const route = useRouter();
-const store = useStore();
 const { loading, request } = useRequest();
+const imgMap = useImgMap();
+const stringMap = useLocalizationString();
 const gameDict: {
   [key in GameGroupBy]: { key: 'hardware' | 'release' | 'recent'; content: GameGroup[] };
 } = {
@@ -91,25 +83,25 @@ const gameDict: {
 const groupBy = ref<GameGroupBy>('PLATFORM');
 const gameGroups = ref<GameGroup[]>([]);
 const currentGroup = ref<string>();
-const gameImgMap = ref<Map<string, Map<string, string>>>(
-  new Map<string, Map<string, string>>()
-);
 const selectRef = ref<HTMLElement>();
 const groupRefs = ref<HTMLElement[]>([]);
 
+const computedGameGroups = computed(() =>
+  gameGroups.value.map((x) => ({
+    ...x,
+    games: x.games.map((y) => ({
+      ...y,
+      $title: stringMap.getString(y, 'title'),
+      $imgPath: imgMap.getPath('game', y),
+    })),
+  }))
+);
+const computedGroupNames = computed(() =>
+  computedGameGroups.value.map((x) => x.name.toString())
+);
+
 onMounted(async () => {
   await onGroupByChange();
-
-  const gameList = gameGroups.value.map((x) => x.games).reduce((a, b) => [...a, ...b]);
-  for (const lang of store.langList) {
-    if (!gameImgMap.value.has(lang.id)) {
-      const imgMap = new Map<string, string>();
-      for (const game of gameList) {
-        imgMap.set(game.id, getImgSrc(game, lang.id));
-      }
-      gameImgMap.value.set(lang.id, imgMap);
-    }
-  }
 });
 
 async function getGamesByGroup(groupBy: GameGroupBy): Promise<GameGroup[]> {
@@ -120,6 +112,13 @@ async function getGamesByGroup(groupBy: GameGroupBy): Promise<GameGroup[]> {
 
   const result = await request(getGames(target.key));
   target.content = result;
+
+  if (!gameGroups.value.length) {
+    const gameList = result.map((x) => x.games).reduce((a, b) => [...a, ...b]);
+    imgMap.setData('game', gameList);
+    stringMap.setData(gameList, 'title');
+  }
+
   return result;
 }
 

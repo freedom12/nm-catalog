@@ -7,21 +7,22 @@
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
   transform: translateY(0.5rem);
 
-  .game {
-    display: flex;
+  > .common-detail {
     min-height: 200px;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
 
-    > img {
-      width: 200px;
-      height: 200px;
-    }
-
     > div {
-      flex: 1;
-      padding-left: 2rem;
-      text-align: left;
+      &.detail-image {
+        > img {
+          width: 200px;
+          height: 200px;
+        }
+      }
+
+      &.detail-text {
+        padding-left: 2rem;
+      }
     }
   }
 
@@ -48,79 +49,8 @@
     }
   }
 
-  :deep(.detail) {
+  .detail {
     padding-top: 0.8rem;
-    text-align: left;
-
-    ol {
-      > li {
-        display: flex;
-        padding: 0.5rem 0;
-
-        > div {
-          &:first-child {
-            width: 200px;
-            height: 100px;
-
-            > img {
-              height: 100px;
-              margin: 0 auto;
-            }
-          }
-
-          &:last-child {
-            flex: 1;
-            padding-left: 1rem;
-
-            h4 {
-              position: relative;
-              padding-right: 3em;
-            }
-          }
-        }
-
-        &.hidden {
-          display: none;
-        }
-      }
-    }
-
-    .radio-group {
-      margin-bottom: 1.5em;
-      text-align: right;
-    }
-  }
-
-  :deep(img) {
-    display: block;
-    cursor: pointer;
-  }
-
-  h2,
-  :deep(h4) {
-    margin: 0 0 0.5rem;
-    small {
-      display: inline-block;
-      opacity: 0.4;
-    }
-  }
-
-  :deep(ul) {
-    > li {
-      margin: 0 0 0.2rem;
-      font-size: 0.9rem;
-
-      > b {
-        display: inline-block;
-        width: 3.5rem;
-      }
-    }
-  }
-
-  :deep(ul) {
-    margin-top: 0;
-    opacity: 0.5;
-    font-size: 0.8rem;
   }
 }
 
@@ -138,36 +68,25 @@
     box-shadow: none !important;
     font-size: 0.7rem;
 
-    .game {
+    > .common-detail {
       min-height: 90px;
       padding-bottom: 0;
 
-      > img {
-        width: 80px;
-        height: 80px;
-      }
-
       > div {
-        padding-left: 1rem;
-      }
-    }
+        &.detail-image {
+          display: block !important;
+          width: initial;
 
-    :deep(.detail) {
-      ol {
-        > li {
-          > div:first-child {
-            display: none !important;
+          > img {
+            width: 80px;
+            height: 80px;
           }
         }
+
+        &.detail-text {
+          padding-left: 1rem;
+        }
       }
-    }
-
-    :deep(h4) {
-      font-size: 0.8rem;
-    }
-
-    :deep(ul) {
-      display: none;
     }
   }
 }

@@ -2,49 +2,35 @@
   <footer id="footer">
     <label>
       Main Language:
-      <select name="lang" v-model="lang" @change="onLangChange">
-        <option v-for="lang in langList" :key="lang.id" :value="lang.id">
-          {{ lang.id }}
+      <select name="lang" v-model="mainLang" @change="onLangChange">
+        <option v-for="lang in langList" :key="lang" :value="lang">
+          {{ lang }}
         </option>
       </select>
       <span @click.stop="scrollToTop()">Top ↑</span>
-      <span @click.stop="goSectionGroup()">其他播放列表</span> 
+      <span @click.stop="goSectionGroup()">其他播放列表</span>
     </label>
   </footer>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import axios from 'axios';
-import type { Lang } from '@/types';
+import { LangCode, type LangCodeValue } from '@/types';
 import { useStore } from '@/stores';
 import { scrollToY } from '@/utils/dom-utils';
 import router from '@/routers';
 
 const store = useStore();
-const langList = ref<Lang[]>([]);
-const lang = ref<string>(store.mainLang);
+const langList = Object.values(LangCode);
+const mainLang = ref<LangCodeValue>(store.mainLang);
 
 onMounted(async () => {
-  setupLang();
+  store.setLangList(langList);
 });
-
-async function setupLang() {
-  const cache = localStorage.getItem('langList');
-  let result: Lang[];
-  if (cache) {
-    result = JSON.parse(cache);
-  } else {
-    result = (await axios.get('/api/list/lang')).data;
-    localStorage.setItem('langList', JSON.stringify(result));
-  }
-  store.setLangList(result);
-  langList.value = result;
-}
 
 function onLangChange(event: Event) {
   const value = (event.target as HTMLSelectElement).value;
-  store.setMainLang(value);
+  store.setMainLang(value as LangCodeValue);
 }
 
 function scrollToTop() {

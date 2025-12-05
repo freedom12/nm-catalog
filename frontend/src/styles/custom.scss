@@ -1,0 +1,116 @@
+.radio-group {
+  label {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 1.5em;
+    cursor: pointer;
+
+    input[type='radio'] {
+      margin: 0;
+
+      + span {
+        display: inline-block;
+        opacity: 0.5;
+        font-weight: bolder;
+        font-size: 0.8em;
+        text-indent: 0.5em;
+      }
+
+      &:checked {
+        + span {
+          opacity: 1;
+        }
+      }
+    }
+
+    &.disabled {
+      cursor: default;
+      pointer-events: none;
+
+      input[type='radio'] {
+        + span {
+          opacity: 0.25;
+        }
+      }
+    }
+  }
+}
+
+.prefix-text {
+  display: flex;
+  align-items: baseline;
+}
+
+.common-detail {
+  display: flex;
+  padding: 0.5rem 0;
+  text-align: left;
+
+  > div {
+    &.detail-image {
+      width: 200px;
+      height: 100px;
+
+      > img {
+        display: block;
+        height: 100px;
+        margin: 0 auto;
+        cursor: pointer;
+      }
+    }
+
+    &.detail-text {
+      flex: 1;
+      padding-left: 1rem;
+
+      .text-main {
+        position: relative;
+        margin: 0 0 0.5rem;
+        padding-right: 3em;
+
+        small {
+          display: inline-block;
+          margin-top: .5em;
+          opacity: 0.4;
+        }
+      }
+
+      ul.text-else {
+        margin-top: 0;
+        opacity: 0.5;
+        font-size: 0.8rem;
+
+        > li {
+          display: flex;
+          margin: 0 0 0.2rem;
+          font-size: 0.9rem;
+
+          > b {
+            display: inline-block;
+            width: 3.5rem;
+          }
+        }
+      }
+    }
+  }
+
+  &.hidden {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .common-detail {
+    > div:first-child {
+      display: none !important;
+    }
+
+    .detail-main {
+      font-size: 0.8rem;
+    }
+
+    ul {
+      display: none;
+    }
+  }
+}

@@ -1,44 +1,42 @@
 <template>
   <Header :observeRef="titleRef">
     <template v-if="data">
-      {{ getLangTitle(data.game, store.mainLang) }}
+      {{ computedTitle }}
       <small>({{ data.game.year }} | {{ data.game.hardware }})</small>
     </template>
   </Header>
   <Container :loading="loading">
     <main id="main" v-if="data">
-      <section class="game">
-        <img
-          :src="gameImgMap.get(store.mainLang)?.get(data.game.id)"
-          @click.stop="openSourceImg(data.game, store.mainLang)"
-          loading="lazy"
-        />
-        <div>
-          <h2 ref="titleRef">
-            {{ getLangTitle(data.game, store.mainLang) }}<br />
+      <section class="common-detail">
+        <div class="detail-image">
+          <img
+            :src="imgMap.getPath('game', data.game)"
+            @click.stop="openSourceImg(data.game, store.mainLang)"
+            loading="lazy"
+          />
+        </div>
+        <div class="detail-text">
+          <h2 class="text-main" ref="titleRef">
+            {{ computedTitle }}<br />
             <small>{{ data.game.year }} | {{ data.game.hardware }}</small>
           </h2>
-          <ul>
-            <li
-              v-for="lang of store.langList.filter((x) => isShowTitle(data!.game, x.id))"
-              :key="lang.id"
-              class="prefix-text"
-            >
-              <b>{{ lang.id }}</b>
-              {{ getLangTitle(data.game, lang.id) }}
+          <ul class="text-else">
+            <li v-for="lang of computedLangs" :key="lang" class="prefix-text">
+              <b>{{ lang }}</b>
+              {{ stringMap.getString(data.game, 'title', lang) }}
             </li>
           </ul>
         </div>
       </section>
       <nav class="tabs">
         <div
-          v-for="(value, key) in GameDataSection"
-          :key="key"
+          v-for="item in computedSections"
+          :key="item.key"
           class="tab"
-          :class="{ active: gameDataSection === key, blank: !(data as any)[`${key.toLocaleLowerCase()}s`]?.length }"
-          @click.stop="gameDataSection = key"
+          :class="{ active: gameDataSection === item.key, blank: !item.len }"
+          @click.stop="gameDataSection = item.key"
         >
-          {{ (data as any)[`${key.toLocaleLowerCase()}s`]?.length }} {{ value }}
+          {{ item.len }} {{ item.label }}
         </div>
       </nav>
       <section class="detail">
@@ -46,17 +44,11 @@
           :hidden="gameDataSection !== 'TRACK'"
           :isShowFilter="true"
           :data="data.tracks"
-          :img-map="trackImgMap"
         ></Track>
-        <Related
-          :hidden="gameDataSection !== 'RELATED'"
-          :data="data.relateds"
-          :img-map="gameImgMap"
-        ></Related>
+        <Related :hidden="gameDataSection !== 'RELATED'" :data="data.relateds"></Related>
         <Playlist
           :hidden="gameDataSection !== 'PLAYLIST'"
           :data="data.playlists"
-          :img-map="playlistImgMap"
         ></Playlist>
       </section>
     </main>
@@ -64,10 +56,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from '@/stores';
 import { useRequest } from '@/composables/useRequest';
+import { useImgMap } from '@/composables/useImgMap';
+import { useLocalizationString } from '@/composables/useLocalizationString';
 import Header from '@/components/Header.vue';
 import Container from '@/components/Container.vue';
 import Track from './components/Track.vue';
@@ -75,7 +69,7 @@ import Related from './components/Related.vue';
 import Playlist from './components/Playlist.vue';
 import { GameDataSection, type GameDetail } from '@/types';
 import { getGameDetail } from '@/api';
-import { getLangTitle, isShowTitle, getImgSrc, openSourceImg } from '@/utils/data-utils';
+import { isShowTitle, openSourceImg } from '@/utils/data-utils';
 
 defineOptions({ name: 'Game' });
 
@@ -83,58 +77,46 @@ const route = useRoute();
 const gid = route.params.gid as string;
 const store = useStore();
 const { loading, request } = useRequest();
+const imgMap = useImgMap();
+const stringMap = useLocalizationString();
 const data = ref<GameDetail>();
 const gameDataSection = ref<GameDataSection>('TRACK');
-const gameImgMap = ref<Map<string, Map<string, string>>>(
-  new Map<string, Map<string, string>>()
-);
-const trackImgMap = ref<Map<string, Map<string, string>>>(
-  new Map<string, Map<string, string>>()
-);
-const playlistImgMap = ref<Map<string, Map<string, string>>>(
-  new Map<string, Map<string, string>>()
-);
 const titleRef = ref<HTMLElement>();
+
+const computedTitle = computed(() => stringMap.getString(data.value!.game, 'title'));
+const computedLangs = computed(() =>
+  store.langList.filter((x) => isShowTitle(data.value!.game, x))
+);
+const computedSections = computed(() => {
+  const result = [];
+  for (const [key, value] of Object.entries(GameDataSection)) {
+    const propName = `${key.toLowerCase()}s`;
+    result.push({
+      key: key as GameDataSection,
+      label: value,
+      len: (data.value as any)[propName]?.length ?? 0,
+    });
+  }
+  return result;
+});
 
 onMounted(async () => {
   await getDetail();
 });
 
 async function getDetail() {
-  data.value = await request(getGameDetail(gid));
-  if (!data.value) {
-    return;
-  }
-
-  for (const lang of store.langList) {
-    let imgMap = new Map<string, string>();
-    imgMap.set(data.value.game.id, getImgSrc(data.value.game, lang.id));
-    gameImgMap.value.set(lang.id, imgMap);
-
-    playlistImgMap.value.set(lang.id, new Map<string, string>());
-
-    if (!trackImgMap.value.has(lang.id)) {
-      imgMap = new Map<string, string>();
-      for (const track of data.value.tracks) {
-        imgMap.set(track.id, getImgSrc(track, lang.id));
-      }
-      trackImgMap.value.set(lang.id, imgMap);
-    }
-  }
-
-  for (const lang of store.langList) {
-    const imgMap = gameImgMap.value.get(lang.id);
-    for (const game of data.value.relateds) {
-      imgMap?.set(game.id, getImgSrc(game, lang.id));
-    }
-  }
-
-  for (const lang of store.langList) {
-    const imgMap = playlistImgMap.value.get(lang.id);
-    for (const playlist of data.value.playlists) {
-      imgMap?.set(playlist.id, getImgSrc(playlist, lang.id));
-    }
-  }
+  const result = await request(getGameDetail(gid));
+  imgMap
+    .setData('game', [result.game, ...result.relateds])
+    .setData('track', result.tracks)
+    .setData('playlist', result.playlists);
+  stringMap
+    .setData(
+      [result.game, ...result.relateds, ...result.tracks, ...result.playlists],
+      'title'
+    )
+    .setData(result.playlists, 'desc');
+  data.value = result;
 }
 </script>
 

@@ -1,32 +1,30 @@
 <template>
   <section :hidden="hidden">
-    <div class="group" v-for="group in groupedPlaylists" :key="group.type">
-      <h3 class="group-title">{{ group.type }}</h3>
-      <ul class="playlist">
+    <template v-for="group in groupedPlaylists" :key="group.type">
+      <h3>{{ group.type }}</h3>
+      <ul>
         <li v-for="playlist in group.playlists" :key="playlist.id">
           <PlaylistCard :playlist="playlist" />
         </li>
       </ul>
-    </div>
+    </template>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { PlaylistType, type Playlist } from '@/types';
+import { type PlaylistType, type Playlist } from '@/types';
 import PlaylistCard from '@/components/PlaylistCard.vue';
 
 const props = defineProps<{
   hidden: boolean;
   data: Playlist[];
-  imgMap: Map<string, Map<string, string>>;
 }>();
 
-// 按 type 分组播放列表
 const groupedPlaylists = computed(() => {
   const groups = new Map<string, Playlist[]>();
 
-  props.data.forEach(playlist => {
+  props.data.forEach((playlist) => {
     const type = getPlaylistTypeLabel(playlist.type);
     if (!groups.has(type)) {
       groups.set(type, []);
@@ -36,45 +34,65 @@ const groupedPlaylists = computed(() => {
 
   return Array.from(groups.entries()).map(([type, playlists]) => ({
     type,
-    playlists
+    playlists,
   }));
 });
 
-function getPlaylistTypeLabel(playlistType: string): string {
+function getPlaylistTypeLabel(playlistType: PlaylistType): string {
   switch (playlistType) {
-    case PlaylistType.MULTIPLE:
-      return '包含系列游戏的播放列表';
-    case PlaylistType.SINGLE_GAME:
-      return '包含单独游戏的播放列表';
+    case 'MULTIPLE':
+      return 'Related Playlist';
+    case 'SINGLE_GAME':
+      return 'Self Theme Playlist';
     default:
       return '';
   }
 }
 </script>
 
-<style scoped>
-.group {
-  margin-bottom: 32px;
+<style lang="scss" scoped>
+@use '@/styles/variables.scss' as *;
+
+h3 {
+  width: 60%;
+  margin-top: 2rem;
+  border-bottom: 1px solid $root-bgColor-light;
+  padding-bottom: 0.5em;
+  opacity: 0.4;
+  text-align: left;
+
+  &:empty {
+    margin: 0;
+    border: none;
+  }
 }
 
-.group:last-child {
-  margin-bottom: 0;
-}
-
-.group-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #ffffff;
-  margin: 0 0 16px 0;
-  padding-bottom: 8px;
-}
-
-.playlist {
+ul {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+
+  &:last-child{
+    margin-bottom: 1rem;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  h3 {
+    border-color: $root-textColor-light;
+  }
+}
+
+@media (max-width: 767px) {
+  ul {
+    display: block;
+    text-align: left;
+
+    > li {
+      display: inline-block;
+      margin: 0.5em 1em 1em;
+      font-weight: bold;
+    }
+  }
 }
 </style>

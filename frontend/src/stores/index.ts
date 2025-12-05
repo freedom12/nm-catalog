@@ -1,18 +1,18 @@
 import { defineStore } from 'pinia';
-import type { Lang } from '@/types';
+import { LangCode, type LangCodeValue } from '@/types';
 
 export const useStore = defineStore('app', {
   state: () => ({
-    mainLang: localStorage.getItem('lang') || 'en-US',
-    langList: [] as Lang[]
+    mainLang: (localStorage.getItem('lang') || LangCode.en_US) as LangCodeValue,
+    langList: [] as LangCodeValue[],
   }),
   actions: {
-    setMainLang(lang: string) {
+    setMainLang(lang: LangCodeValue) {
       this.mainLang = lang;
       localStorage.setItem('lang', lang);
     },
-    setLangList(data: Lang[]) {
+    setLangList(data: LangCodeValue[]) {
       this.langList = data;
-    }
+    },
   },
 });

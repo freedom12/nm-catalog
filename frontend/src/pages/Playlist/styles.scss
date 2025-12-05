@@ -7,121 +7,60 @@
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
   transform: translateY(0.5rem);
 
-  .game {
-    display: flex;
+  > .common-detail {
     min-height: 200px;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
 
-    >img {
-      width: 200px;
-      height: 200px;
-    }
-
-    >div {
-      flex: 1;
-      padding-left: 2rem;
-      text-align: left;
-    }
-  }
-
-  .tabs {
-    display: flex;
-    margin-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.5);
-
-    .tab {
-      flex: 1;
-      border-bottom: 1px solid rgba(128, 128, 128, 0.5);
-      padding: 10px 20px;
-      opacity: 0.3;
-      cursor: pointer;
-
-      &.active {
-        opacity: 1;
-        font-weight: bold;
+    > div {
+      &.detail-image {
+        > img {
+          width: 200px;
+          height: 200px;
+        }
       }
 
-      &.blank {
-        visibility: hidden;
+      &.detail-text {
+        padding-left: 2rem;
+
+        > .text-main {
+          > .text-desc {
+            display: block;
+            margin-top: 0.5em;
+            font-weight: normal;
+            font-size: 0.6em;
+
+            &:empty {
+              display: none;
+            }
+          }
+        }
       }
     }
   }
 
-  :deep(.detail) {
+  .detail {
+    margin-top: 1.8rem;
+    border-top: 1px solid rgba(128, 128, 128, 0.5);
     padding-top: 0.8rem;
-    text-align: left;
 
-    ol {
-      >li {
+    > h3 {
+      > a {
         display: flex;
-        padding: 0.5rem 0;
+        align-items: center;
+        background: linear-gradient(
+          to right,
+          rgba(#929292, 0.3) 0%,
+          rgba(#929292, 0) 100%
+        );
 
-        >div {
-          &:first-child {
-            width: 200px;
-            height: 100px;
-
-            >img {
-              height: 100px;
-              margin: 0 auto;
-            }
-          }
-
-          &:last-child {
-            flex: 1;
-            padding-left: 1rem;
-
-            h4 {
-              position: relative;
-              padding-right: 3em;
-            }
-          }
-        }
-
-        &.hidden {
-          display: none;
+        > img {
+          width: 50px;
+          height: 50px;
+          margin-right: 1em;
         }
       }
     }
-
-    .radio-group {
-      margin-bottom: 1.5em;
-      text-align: right;
-    }
-  }
-
-  :deep(img) {
-    display: block;
-    cursor: pointer;
-  }
-
-  h2,
-  :deep(h4) {
-    margin: 0 0 0.5rem;
-
-    small {
-      display: inline-block;
-      opacity: 0.4;
-    }
-  }
-
-  :deep(ul) {
-    >li {
-      margin: 0 0 0.2rem;
-      font-size: 0.9rem;
-
-      >b {
-        display: inline-block;
-        width: 3.5rem;
-      }
-    }
-  }
-
-  :deep(ul) {
-    margin-top: 0;
-    opacity: 0.5;
-    font-size: 0.8rem;
   }
 }
 
@@ -139,36 +78,31 @@
     box-shadow: none !important;
     font-size: 0.7rem;
 
-    .game {
+    > .common-detail {
       min-height: 90px;
       padding-bottom: 0;
 
-      >img {
-        width: 80px;
-        height: 80px;
-      }
+      > div {
+        &.detail-image {
+          display: block !important;
+          width: initial;
 
-      >div {
-        padding-left: 1rem;
-      }
-    }
+          > img {
+            width: 80px;
+            height: 80px;
+          }
+        }
 
-    :deep(.detail) {
-      ol {
-        >li {
-          >div:first-child {
-            display: none !important;
+        &.detail-text {
+          padding-left: 1rem;
+
+          > .text-main {
+            > .text-desc {
+              font-size: 0.8em;
+            }
           }
         }
       }
-    }
-
-    :deep(h4) {
-      font-size: 0.8rem;
-    }
-
-    :deep(ul) {
-      display: none;
     }
   }
 }

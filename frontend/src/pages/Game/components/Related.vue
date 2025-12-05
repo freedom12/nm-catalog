@@ -1,18 +1,18 @@
 <template>
   <section :hidden="hidden">
     <ol>
-      <li v-for="relate in data" :key="relate.id">
-        <div>
+      <li v-for="relate in data" :key="relate.id" class="common-detail">
+        <div class="detail-image">
           <img
-            :src="imgMap?.get(store.mainLang)?.get(relate.id)"
+            :src="imgMap.getPath('game', relate)"
             @click.stop="openSourceImg(relate, store.mainLang)"
             loading="lazy"
           />
         </div>
-        <div>
-          <h4>
+        <div class="detail-text">
+          <h4 class="text-main">
             <router-link :to="`/game/${relate.id}`">
-              {{ getLangTitle(relate, store.mainLang) }}</router-link
+              {{ stringMap.getString(relate, 'title') }}</router-link
             >
             <span>{{ relate.year }} | {{ relate.hardware }}</span>
           </h4>
@@ -24,16 +24,19 @@
 
 <script setup lang="ts">
 import { useStore } from '@/stores';
+import { useImgMap } from '@/composables/useImgMap';
+import { useLocalizationString } from '@/composables/useLocalizationString';
 import type { Game } from '@/types';
-import { getLangTitle, openSourceImg } from '@/utils/data-utils';
+import { openSourceImg } from '@/utils/data-utils';
 
 defineProps<{
   hidden: boolean;
   data: Game[];
-  imgMap: Map<string, Map<string, string>>;
 }>();
 
 const store = useStore();
+const imgMap = useImgMap();
+const stringMap = useLocalizationString();
 </script>
 
 <style lang="scss" scoped>

@@ -1,6 +1,6 @@
 <template>
   <section :hidden="hidden">
-    <div class="radio-group" :hidden="!isShowFilter">
+    <div class="radio-group">
       <label
         v-for="(label, key) in TrackMode"
         :key="key"
@@ -10,65 +10,27 @@
         <span>{{ label }} ({{ getTrackCount(key) }})</span>
       </label>
     </div>
-    <ol>
-      <li
-        v-for="(track, index) in data"
-        :key="track.idx"
-        :class="{
-          hidden:
-            (trackMode === 'TOP' && !track.isbest) ||
-            (trackMode === 'LOOP' && !track.isloop),
-        }"
-      >
-        <div>
-          <img
-            :src="imgMap?.get(store.mainLang)?.get(track.id)"
-            @click.stop="openSourceImg(track, store.mainLang)"
-            loading="lazy"
-          />
-        </div>
-        <div>
-          <h4 class="prefix-text">
-            {{ index + 1 }}.&nbsp;
-            <span>
-              {{ getLangTitle(track, store.mainLang) }}
-              <small>({{ track.duration }})</small>
-            </span>
-            <div class="tag">
-              <SvgIcon type="star" :class="{ active: track.isbest }"></SvgIcon>
-              <SvgIcon type="repeat" :class="{ active: track.isloop }"></SvgIcon>
-            </div>
-          </h4>
-          <ul>
-            <li
-              v-for="lang of store.langList.filter((x) => isShowTitle(track, x.id))"
-              :key="lang.id"
-              class="prefix-text"
-            >
-              <b>{{ lang.id }}</b> {{ getLangTitle(track, lang.id) }}
-            </li>
-          </ul>
-        </div>
-      </li>
-    </ol>
+    <TrackItem
+      v-for="track in data"
+      :key="track.id"
+      :data="track"
+      :hidden="
+        (trackMode === 'TOP' && !track.isbest) || (trackMode === 'LOOP' && !track.isloop)
+      "
+    ></TrackItem>
   </section>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useStore } from '@/stores';
-import SvgIcon from '@/components/SvgIcon.vue';
+import TrackItem from '@/components/TrackItem.vue';
 import { TrackMode, type Track } from '@/types';
-import { getLangTitle, isShowTitle, openSourceImg } from '@/utils/data-utils';
 
 const props = defineProps<{
   hidden: boolean;
-  isShowFilter: boolean;
   data: Track[];
-  imgMap: Map<string, Map<string, string>>;
 }>();
 
-const store = useStore();
 const trackMode = ref<TrackMode>('ALL');
 
 function getTrackCount(mode: TrackMode): number {
@@ -84,45 +46,8 @@ function getTrackCount(mode: TrackMode): number {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables.scss' as *;
-
-.tag {
-  position: absolute;
-  top: 0.45em;
-  right: 0.5em;
-  display: flex;
-  align-items: flex-start;
-  height: 100%;
-
-  .svg-icon {
-    margin-left: 0.3em;
-    opacity: 0.2;
-    transform: translateY(-0.2em);
-
-    &.active {
-      opacity: 0.5;
-    }
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  .tag {
-    .svg-icon {
-      color: $root-linkColor;
-      opacity: 0.4;
-
-      &.active {
-        opacity: 1;
-      }
-    }
-  }
-}
-
-@media (max-width: 767px) {
-  .tag {
-    .svg-icon {
-      display: none;
-    }
-  }
+.radio-group {
+  margin-bottom: 1.5em;
+  text-align: right;
 }
 </style>

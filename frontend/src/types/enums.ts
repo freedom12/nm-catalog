@@ -13,12 +13,12 @@ export const GameDataSection = {
 export type GameDataSection = keyof typeof GameDataSection;
 
 export const PlaylistType = {
-  SINGLE_GAME_ALL: 'SINGLE_GAME_ALL',
-  BEST: 'BEST',
-  LOOP: 'LOOP',
-  SINGLE_GAME: 'SINGLE_GAME',
-  MULTIPLE: 'MULTIPLE',
-  SPECIAL: 'SPECIAL',
+  SINGLE_GAME_ALL: 'Single-Game: All Tracks',
+  BEST: 'Single-Game: Top Tracks',
+  LOOP: 'Single-Game: Extended Tracks',
+  SINGLE_GAME: 'Single-Game: Theme Playlist',
+  MULTIPLE: 'Multi-Game: Related Playlist',
+  SPECIAL: 'Special Playlist',
 };
 export type PlaylistType = keyof typeof PlaylistType;
 
@@ -39,5 +39,6 @@ export const LangCode = {
   ko_KR: 'ko-KR',
   zh_CN: 'zh-CN',
   zh_TW: 'zh-TW',
-};
+} as const;
 export type LangCode = keyof typeof LangCode;
+export type LangCodeValue = (typeof LangCode)[keyof typeof LangCode];

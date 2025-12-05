@@ -7,8 +7,8 @@
       <li
         v-for="(option, i) in options"
         :key="option"
-        :data-name="getLabel(i, gap)"
-        :class="{ active: option === title, hidden: !!gap && i % gap > 0 }"
+        :data-name="getLabel(i, step)"
+        :class="{ active: option === title, hidden: !!step && i % step > 0 }"
         :style="{
           transform: `translateY(${
             navheight * (percentages[i] + (1 - percentages[options.length - 1]) / 2)
@@ -31,7 +31,7 @@ const props = defineProps<{
   target: HTMLElement[];
   options: string[];
   title?: string | number;
-  gap?: number;
+  step?: number;
 }>();
 const emit = defineEmits(['update:title']);
 const percentages = ref<number[]>([]);
@@ -40,7 +40,7 @@ const navheight = ref<number>(0);
 const tracker = new ElementTracker((entries) => {
   const entry = entries.find((x) => x.isIntersecting);
   if (entry) {
-    const gap = props.gap ?? 1;
+    const gap = props.step ?? 1;
     if (gap === 1) {
       emit('update:title', entry!.target.firstElementChild?.innerHTML);
     } else {
