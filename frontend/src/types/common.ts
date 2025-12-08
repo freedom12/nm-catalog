@@ -44,3 +44,4 @@ export type NMData = MultiLangVisualEntity;
 // }
 
 export const MAIN_TITLE = 'Nintendo Music Catalog';
+export const DEFAULT_LANG = LangCode.en_US;

@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia';
-import { LangCode, type LangCodeValue } from '@/types';
+import { DEFAULT_LANG, type LangCodeValue } from '@/types';
 
 export const useStore = defineStore('app', {
   state: () => ({
-    mainLang: (localStorage.getItem('lang') || LangCode.en_US) as LangCodeValue,
+    mainLang: (localStorage.getItem('lang') || DEFAULT_LANG) as LangCodeValue,
     langList: [] as LangCodeValue[],
   }),
   actions: {

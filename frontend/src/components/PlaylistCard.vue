@@ -22,7 +22,7 @@ const stringMap = useLocalizationString();
 .playlist {
   > img {
     width: 100%;
-    min-height: 200px;
+    min-height: 180px;
     border-radius: 8px;
   }
 }

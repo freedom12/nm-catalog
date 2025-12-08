@@ -1,9 +1,8 @@
 import { useStore } from '@/stores';
-import { LangCode, type NMData } from '@/types';
+import { DEFAULT_LANG, LangCode, type NMData } from '@/types';
 
 export class LocalizationString {
   private localizationMap: Map<string, string> = new Map<string, string>();
-  private defaultLangCode: string = LangCode.en_US;
 
   constructor(
     data: NMData,
@@ -35,9 +34,7 @@ export class LocalizationString {
   get(langCode?: string): string {
     langCode = LocalizationString.convertLangCode(langCode);
     return (
-      this.localizationMap.get(langCode) ??
-      this.localizationMap.get(this.defaultLangCode) ??
-      ''
+      this.localizationMap.get(langCode) ?? this.localizationMap.get(DEFAULT_LANG) ?? ''
     );
   }
 

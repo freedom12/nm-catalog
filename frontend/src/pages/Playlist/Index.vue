@@ -83,8 +83,12 @@ const computedTrackGroup: ComputedRef<{ game?: Game; tracks: PTrack[] }[]> = com
       return [];
     }
     if (data.value.playlist.isrelatedgame) {
+      const gameSeq =
+        data.value.playlist.type !== 'MULTIPLE'
+          ? [data.value.games![0].id]
+          : [...new Set(data.value.tracks.map((x) => x.gid))];
       return data.value
-        .games!.sort((a, b) => a.year - b.year)
+        .games!.sort((a, b) => gameSeq.indexOf(a.id) - gameSeq.indexOf(b.id))
         .map((x) => ({
           game: x,
           tracks: data.value!.tracks.filter((y) => {

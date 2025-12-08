@@ -1,10 +1,10 @@
 import { useStore } from '@/stores';
-import { LangCode, type NMData, type Track } from '@/types';
+import { DEFAULT_LANG, type NMData, type Track } from '@/types';
 import { LocalizationString } from './localization-string';
 
 export const isShowTitle = (target: NMData, lang: string): boolean => {
   const mainLang = useStore().mainLang;
-  if (lang === LangCode.en_US && mainLang !== LangCode.en_US) {
+  if (lang === DEFAULT_LANG && mainLang !== DEFAULT_LANG) {
     return true;
   }
   if (lang === mainLang) {
@@ -23,8 +23,8 @@ export const openSourceImg = (target: NMData, lang: string) => {
   );
 };
 
-export const getTotalDuration = (tracks?: Track[]): string => {
-  if (!tracks || tracks.length === 0) {
+export const getTotalDuration = (tracks: Track[]): string => {
+  if (tracks.length === 0) {
     return '0:00';
   }
   let totalSeconds = 0;

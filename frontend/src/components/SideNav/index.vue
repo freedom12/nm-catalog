@@ -40,12 +40,12 @@ const navheight = ref<number>(0);
 const tracker = new ElementTracker((entries) => {
   const entry = entries.find((x) => x.isIntersecting);
   if (entry) {
-    const gap = props.step ?? 1;
-    if (gap === 1) {
+    const step = props.step ?? 1;
+    if (step === 1) {
       emit('update:title', entry!.target.firstElementChild?.innerHTML);
     } else {
       const idx = Math.floor(props.target.indexOf(entry!.target as HTMLElement));
-      emit('update:title', props.target[idx - (idx % gap)].firstElementChild?.innerHTML);
+      emit('update:title', props.target[idx - (idx % step)].firstElementChild?.innerHTML);
     }
   }
 });
@@ -97,11 +97,11 @@ async function navigateTo(idx: number) {
   });
 }
 
-function getLabel(i: number, gap = 1): string {
-  if (gap === 1) {
+function getLabel(i: number, step = 1): string {
+  if (step === 1) {
     return props.options[i];
   } else {
-    const next = props.options[i + gap - 1];
+    const next = props.options[i + step - 1];
     return `${next ? `${next}-` : 'By '}${props.options[i]}`;
   }
 }

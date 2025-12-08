@@ -33,7 +33,7 @@ const groupedPlaylists = computed(() => {
   });
 
   return Array.from(groups.entries()).map(([type, playlists]) => ({
-    type,
+    type: !type ? type : `${type}s`,
     playlists,
   }));
 });
@@ -69,10 +69,11 @@ h3 {
 
 ul {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, 180px);
+  justify-content: space-evenly;
+  gap: 24px 16px;
 
-  &:last-child{
+  &:last-child {
     margin-bottom: 1rem;
   }
 }
