@@ -44,6 +44,9 @@ let hasError = false;
         continue;
       }
 
+      const playlistGameData = [];
+      const playlistTrackData = [];
+
       for (const lang of langs) {
         rawPlaylistData = await getGamePlayListInfo(gameId, lang);
         const playlistData = [
@@ -64,20 +67,25 @@ let hasError = false;
         trans(playlistData);
 
         if (!langs.indexOf(lang)) {
-          const playlistGameData = playlistData.map((x) => [x[0], gameId]);
-          trans = getTransactionByStatement(stmt.playlist_game.insert);
-          trans(playlistGameData);
+          playlistGameData.push(...playlistData.map((x) => [x[0], gameId]));
         }
       }
 
-      const playlistTrackData = [];
       for (const playlist of rawPlaylistData.miscPlaylistSet.officialPlaylists) {
         if (playlist.type !== 'LOOP' && !updateds.playlistIds.includes(playlist.id)) {
-          const data = (await getPlaylistTrack(playlist.id, langs[0])).tracks.map(
-            (x, i) => [playlist.id, i + 1, x.id]
-          );
+          const rawData = await getPlaylistTrack(playlist.id, langs[0]);
+          const data = rawData.tracks.map((x, i) => [playlist.id, i + 1, x.id]);
           stmt.playlist_track.deleteByPid.run(playlist.id);
           playlistTrackData.push(...data);
+
+          if (playlist.type === 'MULTIPLE') {
+            playlistGameData.push(
+              ...[...new Set(rawData.tracks.map((x) => x.game.id))].map((x) => [
+                playlist.id,
+                x,
+              ])
+            );
+          }
         }
         updateds.playlistIds.push(playlist.id);
       }
@@ -87,6 +95,8 @@ let hasError = false;
       );
       updateds.gameIds.push(gameId);
 
+      trans = getTransactionByStatement(stmt.playlist_game.insert);
+      trans(playlistGameData);
       trans = getTransactionByStatement(stmt.playlist_track.insert);
       trans(playlistTrackData);
     }
