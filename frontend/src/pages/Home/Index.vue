@@ -23,7 +23,7 @@
         <ul class="game">
           <li class="card" v-for="game in group.games" :key="game.id">
             <router-link :to="`/game/${game.id}`" :title="game.$title">
-              <img :src="game.$imgPath" loading="lazy" />
+              <img v-fallback :src="game.$imgPath" loading="lazy" />
               <span>{{ game.$title }}</span>
             </router-link>
           </li>

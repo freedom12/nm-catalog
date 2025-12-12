@@ -2,6 +2,7 @@ import { ref } from 'vue';
 import { DEFAULT_LANG, LangCode, type LangCodeValue, type NMData } from '@/types';
 import { useStore } from '@/stores';
 import { LocalizationString } from '@/utils/localization-string';
+import { fallbackSrc } from '@/plugins/fallbackImage';
 
 type DataTypeName = 'game' | 'track' | 'playlist';
 
@@ -35,11 +36,7 @@ const api = {
   getPath(dataType: DataTypeName, data: NMData, lang?: LangCodeValue): string {
     const key = `${dataType}:${data.id}:${lang ?? useStore().mainLang}`;
     const alterKey = `${dataType}:${data.id}:${DEFAULT_LANG}`;
-    return (
-      imgMap.value.get(key) ??
-      imgMap.value.get(alterKey) ??
-      `data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' stroke='rgba(128,128,128,0.45)' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='24' height='24' rx='4' ry='4'/%3E%3Cpath d='M10 22l4-4 3 3 5-5'/%3E%3Ccircle cx='12.5' cy='12.5' r='2.2'/%3E%3C/svg%3E`
-    );
+    return imgMap.value.get(key) ?? imgMap.value.get(alterKey) ?? fallbackSrc;
   },
 };
 

@@ -4,6 +4,7 @@
       <li v-for="relate in data" :key="relate.id" class="common-detail">
         <div class="detail-image">
           <img
+            v-fallback
             :src="imgMap.getPath('game', relate)"
             @click.stop="openSourceImg(relate, store.mainLang)"
             loading="lazy"

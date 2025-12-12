@@ -1,6 +1,6 @@
 <template>
   <router-link :to="`/playlist/${playlist.id}`" class="playlist">
-    <img :src="imgMap.getPath('playlist', playlist)" loading="lazy" />
+    <img v-fallback :src="imgMap.getPath('playlist', playlist)" loading="lazy" />
     <span> {{ stringMap.getString(playlist, 'title') }} ({{ playlist.tracksnum }}) </span>
   </router-link>
 </template>

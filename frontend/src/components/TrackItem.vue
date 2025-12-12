@@ -2,6 +2,7 @@
   <div class="common-detail" v-show="!hidden">
     <div class="detail-image">
       <img
+        v-fallback
         :src="imgMap.getPath('track', data)"
         @click.stop="openSourceImg(data, store.mainLang)"
         loading="lazy"

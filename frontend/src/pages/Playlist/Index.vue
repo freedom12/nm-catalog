@@ -10,6 +10,7 @@
       <section class="common-detail">
         <div class="detail-image">
           <img
+            v-fallback
             :src="imgMap.getPath('playlist', data.playlist)"
             @click.stop="openSourceImg(data.playlist, store.mainLang)"
             loading="lazy"
@@ -33,7 +34,7 @@
         <template v-for="group in computedTrackGroup">
           <h3 v-if="group.game">
             <router-link :to="`/game/${group.game.id}`">
-              <img :src="imgMap.getPath('game', group.game)" loading="lazy" />
+              <img v-fallback :src="imgMap.getPath('game', group.game)" loading="lazy" />
               {{ stringMap.getString(group.game, 'title') }}</router-link
             >
           </h3>

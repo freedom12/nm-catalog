@@ -10,6 +10,7 @@
       <section class="common-detail">
         <div class="detail-image">
           <img
+            v-fallback
             :src="imgMap.getPath('game', data.game)"
             @click.stop="openSourceImg(data.game, store.mainLang)"
             loading="lazy"
