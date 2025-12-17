@@ -10,4 +10,11 @@ const info = (message) => {
   console.log('\x1b[32m%s\x1b[0m', message);
 };
 
-module.exports = { request, info };
+const getDuration = (ms) => {
+  const totalSeconds = Math.ceil(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes.toString()}:${seconds.toString().padStart(2, '0')}`;
+};
+
+module.exports = { request, info, getDuration };

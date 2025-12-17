@@ -11,7 +11,7 @@ import stmt from '../db/statements.js';
 import { getTransactionByStatement } from '../db/transaction.js';
 import rw from '../utils/rw.js';
 import tools from '../utils/tools.js';
-const { request, info } = tools;
+const { request, info, getDuration } = tools;
 
 const args = process.argv.slice(2);
 const isUpdateSpecific =
@@ -168,13 +168,13 @@ const existedGameIds = stmt.game.select.all().map((x) => x.id);
 
     if (!isFullUpdate) {
       rw.writeText(
-        'new_game.json',
+        rw.paths['new_game.json'],
         games.map((x) => x.id)
       );
     }
-    rw.writeText('res-platform.json', '');
-    rw.writeText('res-year.json', '');
-    rw.writeText('updated-playlist.json', '{}');
+    rw.writeText(rw.paths['res_game_platform.json'], '');
+    rw.writeText(rw.paths['res_game_year.json'], '');
+    rw.writeText(rw.paths['updated_playlist.json'], '{}');
   } catch (err) {
     console.error(err);
     process.exit(1);
@@ -209,11 +209,4 @@ async function getRelateByGame(gameId) {
   return await request(
     `https://api.m.nintendo.com/catalog/games/${gameId}/relatedGames?country=JP&lang=zh-CN`
   );
-}
-
-function getDuration(ms) {
-  const totalSeconds = Math.ceil(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes.toString()}:${seconds.toString().padStart(2, '0')}`;
 }

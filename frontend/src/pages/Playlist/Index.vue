@@ -58,7 +58,12 @@ import { useStore } from '@/stores';
 import { useRequest } from '@/composables/useRequest';
 import { useImgMap } from '@/composables/useImgMap';
 import { useLocalizationString } from '@/composables/useLocalizationString';
-import { PlaylistType, type Game, type PlaylistDetail, type Track } from '@/types';
+import {
+  PlaylistType,
+  type Game,
+  type PlaylistDetail,
+  type PlaylistTrack,
+} from '@/types';
 import Header from '@/components/Header.vue';
 import Container from '@/components/Container.vue';
 import TrackItem from '@/components/TrackItem.vue';
@@ -77,9 +82,8 @@ const data = ref<PlaylistDetail>();
 const titleRef = ref<HTMLElement>();
 
 const computedTitle = computed(() => stringMap.getString(data.value!.playlist, 'title'));
-type PTrack = Track & { pidx?: number };
-const computedTrackGroup: ComputedRef<{ game?: Game; tracks: PTrack[] }[]> = computed(
-  () => {
+const computedTrackGroup: ComputedRef<{ game?: Game; tracks: PlaylistTrack[] }[]> =
+  computed(() => {
     if (!data.value) {
       return [];
     }
@@ -93,15 +97,13 @@ const computedTrackGroup: ComputedRef<{ game?: Game; tracks: PTrack[] }[]> = com
         .map((x) => ({
           game: x,
           tracks: data.value!.tracks.filter((y) => {
-            (y as PTrack).pidx = data.value!.tracks.indexOf(y) + 1;
             return y.gid === x.id;
           }),
         }));
     } else {
       return [{ tracks: data.value.tracks }];
     }
-  }
-);
+  });
 
 onMounted(async () => {
   await getDetail();

@@ -35,10 +35,13 @@ if (!targetLangs.length) {
   langs = targetLangs;
 }
 
-const sGameIds = rw.readText('new_game.json').slice(1, -1).replace(/"/g, `'`);
+const sGameIds = rw.readText(rw.paths['new_game.json']).slice(1, -1).replace(/"/g, `'`);
 const tasks = [];
-const sPalylistIds = JSON.parse(rw.readText('updated-playlist.json'))
+const sPalylistIds = JSON.parse(rw.readText(rw.paths['updated_playlist.json']))
   .playlistIds.map((x) => `'${x}'`)
+  .join(',');
+const sSectionPalylistIds = JSON.parse(rw.readText(rw.paths['updated_playlist.json']))
+  .sectionPlaylistIds.map((x) => `'${x}'`)
   .join(',');
 
 for (const lang of langs) {
@@ -49,15 +52,24 @@ for (const lang of langs) {
     const diff = lang.includes('en') ? '' : `and img_${langStr} <> img_en_US`;
     const sql = `
         select img_${langStr} from game where id in (${sGameIds}) ${diff} 
-        union select img_${langStr} from track where gid in (${sGameIds}) ${diff}
-        union select img_${langStr} from playlist where id in (${sPalylistIds}) ${diff}
+        union select img_${langStr} from track where gid in (${sGameIds}) ${
+      !sSectionPalylistIds
+        ? ''
+        : `or id in (select tid from playlist_track t1 inner join playlist t2 on t1.pid=t2.id where t2.type='SPECIAL' and t1.pid in (${sSectionPalylistIds}))`
+    } ${diff}
+        union select img_${langStr} from playlist where id in (${[
+      sPalylistIds,
+      sSectionPalylistIds,
+    ]
+      .filter((x) => x)
+      .join(',')}) ${diff}
       `;
     imgIds = stmt
       .sql(sql)
       .all()
       .map((x) => x[`img_${langStr}`]);
   } else {
-    const errors = JSON.parse(rw.readText('error_img.json'));
+    const errors = JSON.parse(rw.readText(rw.paths['error_img.json']));
     imgIds = errors[lang];
   }
 
@@ -128,7 +140,7 @@ async function runAll() {
   for (const task of tasks) {
     errors[task.lang] = task.errors;
   }
-  rw.writeText('error_img.json', errors);
+  rw.writeText(rw.paths['error_img.json'], errors);
   console.log(`All tasks completed`);
 }
 

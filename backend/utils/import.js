@@ -120,9 +120,9 @@ const importdata = (files, settings, db = require('../db')) => {
   });
 
   setTimeout(() => {
-    rw.writeText('new_game.json', newGameIds);
-    rw.writeText('res-platform.json', '');
-    rw.writeText('res-year.json', '');
+    rw.writeText(rw.paths['new_game.json'], newGameIds);
+    rw.writeText(rw.paths['res_game_platform.json'], '');
+    rw.writeText(rw.paths['res_game_year.json'], '');
   });
 
   console.log('Data successfully updated.');

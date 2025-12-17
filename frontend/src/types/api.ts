@@ -12,8 +12,13 @@ export interface GameDetail {
   relateds: Game[];
 }
 
+export interface PlaylistTrack extends Track {
+  pidx: number;
+  game?: Game;
+}
+
 export interface PlaylistDetail {
   playlist: Playlist;
   games?: Game[];
-  tracks: Track[];
+  tracks: PlaylistTrack[];
 }

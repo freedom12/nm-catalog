@@ -1,104 +1,184 @@
 /*
   Pull data of playlists from Nintendo APIs (run [pull-game] first when update)
+  
+  -- section       # from playlist_section.json
+  -- (gid | pid)   # update playlists of specific games or playlists (with "-- section")
 */
 
 import stmt from '../db/statements.js';
 import { getTransactionByStatement } from '../db/transaction.js';
 import rw from '../utils/rw.js';
 import tools from '../utils/tools.js';
-const { request, info } = tools;
+const { request, info, getDuration } = tools;
 
 const args = process.argv.slice(2);
-const specificGameIds = args.filter((x) =>
+const specificIds = args.filter((x) =>
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(x)
 );
+const isFromSection = args.includes('section');
 const langs = stmt.lang.select.all().map((x) => x.id);
 let hasError = false;
 
 (async () => {
   let updateds;
   try {
-    updateds = JSON.parse(rw.readText('updated-playlist.json'));
+    updateds = JSON.parse(rw.readText(rw.paths['updated_playlist.json']));
   } catch (error) {
     updateds = {};
   }
   updateds.gameIds = updateds.gameIds ?? [];
   updateds.playlistIds = updateds.playlistIds ?? [];
+  updateds.sectionPlaylistIds = updateds.sectionPlaylistIds ?? [];
 
   try {
-    const sGameIds = (
-      !specificGameIds.length ? JSON.parse(rw.readText('new_game.json')) : specificGameIds
-    )
-      .map((x) => `'${x}'`)
-      .join(',');
-    const sql = `select id from game where id in (${sGameIds}) and link == ''`;
-    const gameIds = stmt
-      .sql(sql)
-      .all()
-      .map((x) => x.id);
-    let rawPlaylistData = [];
     let trans;
 
-    for (const gameId of gameIds) {
-      if (updateds.gameIds.includes(gameId)) {
-        continue;
-      }
+    if (!isFromSection) {
+      const sGameIds = (
+        !specificIds.length
+          ? JSON.parse(rw.readText(rw.paths['new_game.json']))
+          : specificIds
+      )
+        .map((x) => `'${x}'`)
+        .join(',');
+      const sql = `select id from game where id in (${sGameIds}) and link == ''`;
+      const gameIds = stmt
+        .sql(sql)
+        .all()
+        .map((x) => x.id);
+      let rawPlaylistData;
 
-      const playlistGameData = [];
-      const playlistTrackData = [];
-
-      for (const lang of langs) {
-        rawPlaylistData = await getGamePlayListInfo(gameId, lang);
-        const playlistData = [
-          rawPlaylistData.allPlaylist,
-          rawPlaylistData.bestPlaylist,
-          ...rawPlaylistData.miscPlaylistSet.officialPlaylists,
-        ].map((x) => [
-          x.id,
-          x.type,
-          1,
-          x.tracksNum ?? x.tracks.length,
-          x.name,
-          x.thumbnailURL.split('/').reverse()[0],
-          x.description || '',
-        ]);
-
-        trans = getTransactionByStatement(stmt.playlist.insert(lang));
-        trans(playlistData);
-
-        if (!langs.indexOf(lang)) {
-          playlistGameData.push(...playlistData.map((x) => [x[0], gameId]));
+      for (const gameId of gameIds) {
+        if (updateds.gameIds.includes(gameId)) {
+          continue;
         }
-      }
 
-      for (const playlist of rawPlaylistData.miscPlaylistSet.officialPlaylists) {
-        if (playlist.type !== 'LOOP' && !updateds.playlistIds.includes(playlist.id)) {
-          const rawData = await getPlaylistTrack(playlist.id, langs[0]);
-          const data = rawData.tracks.map((x, i) => [playlist.id, i + 1, x.id]);
-          stmt.playlist_track.deleteByPid.run(playlist.id);
-          playlistTrackData.push(...data);
+        const playlistGameData = [];
+        const playlistTrackData = [];
 
-          if (playlist.type === 'MULTIPLE') {
-            playlistGameData.push(
-              ...[...new Set(rawData.tracks.map((x) => x.game.id))].map((x) => [
-                playlist.id,
-                x,
-              ])
-            );
+        for (const lang of langs) {
+          rawPlaylistData = await getGamePlayListInfo(gameId, lang);
+          const playlistData = [
+            rawPlaylistData.allPlaylist,
+            rawPlaylistData.bestPlaylist,
+            ...rawPlaylistData.miscPlaylistSet.officialPlaylists,
+          ].map((x) => [
+            x.id,
+            x.type,
+            1,
+            x.tracksNum ?? x.tracks.length,
+            x.name,
+            x.thumbnailURL.split('/').reverse()[0],
+            x.description || '',
+          ]);
+
+          trans = getTransactionByStatement(stmt.playlist.insert(lang));
+          trans(playlistData);
+
+          if (!langs.indexOf(lang)) {
+            playlistGameData.push(...playlistData.map((x) => [x[0], gameId]));
           }
         }
-        updateds.playlistIds.push(playlist.id);
-      }
-      updateds.playlistIds.push(
-        rawPlaylistData.allPlaylist.id,
-        rawPlaylistData.bestPlaylist.id
-      );
-      updateds.gameIds.push(gameId);
 
-      trans = getTransactionByStatement(stmt.playlist_game.insert);
-      trans(playlistGameData);
-      trans = getTransactionByStatement(stmt.playlist_track.insert);
-      trans(playlistTrackData);
+        for (const playlist of rawPlaylistData.miscPlaylistSet.officialPlaylists) {
+          if (playlist.type !== 'LOOP' && !updateds.playlistIds.includes(playlist.id)) {
+            const rawData = await getPlaylistTrack(playlist.id, langs[0]);
+            const data = rawData.tracks.map((x, i) => [playlist.id, i + 1, x.id]);
+            stmt.playlist_track.deleteByPid.run(playlist.id);
+            playlistTrackData.push(...data);
+
+            if (playlist.type === 'MULTIPLE') {
+              playlistGameData.push(
+                ...[...new Set(rawData.tracks.map((x) => x.game.id))].map((x) => [
+                  playlist.id,
+                  x,
+                ])
+              );
+            }
+          }
+          updateds.playlistIds.push(playlist.id);
+        }
+        updateds.playlistIds.push(
+          rawPlaylistData.allPlaylist.id,
+          rawPlaylistData.bestPlaylist.id
+        );
+        updateds.gameIds.push(gameId);
+
+        trans = getTransactionByStatement(stmt.playlist_game.insert);
+        trans(playlistGameData);
+        trans = getTransactionByStatement(stmt.playlist_track.insert);
+        trans(playlistTrackData);
+      }
+    } else {
+      const sections = JSON.parse(rw.readText(rw.paths['res_playlist_section.json']));
+      let playlists = Object.values(sections).reduce((a, b) => [...a, ...b]);
+      if (specificIds.length) {
+        playlists = playlists.filter((x) => specificIds.includes(x.id));
+      }
+
+      let i = 0;
+      for (const playlist of playlists) {
+        if (updateds.sectionPlaylistIds.includes(playlist.id)) {
+          continue;
+        }
+        const isSpecial = playlist.type === 'SPECIAL',
+          isAnnual = /20\d{2}/.test(playlist.name);
+
+        for (const lang of langs) {
+          const playlistData = [];
+          const trackData = [];
+          const playlistTrackData = [];
+
+          const rawData = await getPlaylistTrack(playlist.id, lang);
+          playlistData.push([
+            rawData.id,
+            rawData.type,
+            0,
+            isSpecial || isAnnual ? rawData.tracks.length : 0,
+            rawData.name,
+            rawData.thumbnailURL.split('/').reverse()[0],
+            rawData.description || '',
+          ]);
+
+          trans = getTransactionByStatement(stmt.playlist.insert(lang));
+          trans(playlistData);
+
+          if (isSpecial) {
+            trackData.push(
+              ...rawData.tracks.map((x) => [
+                x.id,
+                '',
+                0,
+                getDuration(x.media.payloadList[0].durationMillis),
+                0,
+                0,
+                x.name,
+                x.thumbnailURL.split('/').reverse()[0],
+              ])
+            );
+
+            trans = getTransactionByStatement(stmt.track.insert(lang));
+            trans(trackData);
+          }
+
+          if (!langs.indexOf(lang)) {
+            if (isSpecial || isAnnual) {
+              playlistTrackData.push(
+                ...rawData.tracks.map((x, i) => [playlist.id, i + 1, x.id])
+              );
+
+              stmt.playlist_track.deleteByPid.run(playlist.id);
+              trans = getTransactionByStatement(stmt.playlist_track.insert);
+              trans(playlistTrackData);
+            }
+          }
+        }
+
+        rw.writeText(rw.paths['new_game.json'], '[]');
+        updateds.gameIds = [];
+        updateds.playlistIds = [];
+        updateds.sectionPlaylistIds.push(playlist.id);
+      }
     }
 
     info(`Playlist data successfully pulled.`);
@@ -106,7 +186,7 @@ let hasError = false;
     console.error(err);
     hasError = true;
   } finally {
-    rw.writeText('updated-playlist.json', updateds);
+    rw.writeText(rw.paths['updated_playlist.json'], updateds);
     if (hasError) {
       process.exit(1);
     }

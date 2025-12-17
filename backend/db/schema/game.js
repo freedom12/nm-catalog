@@ -28,6 +28,7 @@ module.exports = {
   `,
   select: () => `SELECT * FROM game ORDER BY inserted DESC`,
   selectById: () => `SELECT * FROM game WHERE id = ?`,
+  selectByIds: (ids = []) => `SELECT * FROM game WHERE id in (${ids.join(',')})`,
   selectEntityById: () => `
     WITH RECURSIVE chain AS (
       SELECT *

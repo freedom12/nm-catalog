@@ -9,45 +9,45 @@ router.get('/:id/detail', (req, res) => {
     const games = [];
     const tracks = [];
 
-    if (playlist.isrelatedgame) {
+    if (['SINGLE_GAME_ALL', 'BEST', 'LOOP'].includes(playlist.type)) {
       games.push(...stmt.playlist_game.selectGameByPid.all(id));
 
-      if (playlist.type === 'MULTIPLE') {
+      const allTracks = stmt.track.selectByGid.all(games[0].id);
+      tracks.push(
+        ...allTracks.filter((x) => {
+          switch (playlist.type) {
+            case 'SINGLE_GAME_ALL':
+              return true;
+            case 'BEST':
+              return x.isbest;
+            case 'LOOP':
+              return x.isloop;
+          }
+        })
+      );
+    } else {
+      if (playlist.tracksnum) {
+        if (playlist.isrelatedgame) {
+          games.push(...stmt.playlist_game.selectGameByPid.all(id));
+        }
+
         const ptIds = stmt.playlist_track.selectTrackByPid.all(id).map((x) => x.id);
-        const pTracks = stmt
-          .sql(
-            `select * from track where id in (${ptIds.map((x) => `'${x}'`).join(',')})`
-          )
+        const pTracks = stmt.track
+          .selectByIds(ptIds)
           .all()
           .sort((a, b) => ptIds.indexOf(a.id) - ptIds.indexOf(b.id));
         tracks.push(...pTracks);
       } else {
-        const allTracks = stmt.track.selectByGid.all(games[0].id);
-        if (playlist.type !== 'SINGLE_GAME') {
-          tracks.push(
-            ...allTracks.filter((x) => {
-              switch (playlist.type) {
-                case 'SINGLE_GAME_ALL':
-                  return true;
-                case 'BEST':
-                  return x.isbest;
-                case 'LOOP':
-                  return x.isloop;
-              }
-            })
-          );
-        } else {
-          const ptIds = stmt.playlist_track.selectTrackByPid.all(id).map((x) => x.id);
-          tracks.push(
-            ...allTracks
-              .filter((x) => ptIds.includes(x.id))
-              .sort((a, b) => ptIds.indexOf(a.id) - ptIds.indexOf(b.id))
-          );
-        }
+        // const sUtc9 = now.toLocaleString('en-US', {
+        //   timeZone: 'Asia/Tokyo',
+        // });
+        // # daily order (response/playlist_(pid).json)
       }
-    } else {
-      // TODO
     }
+
+    tracks.forEach((x, i) => {
+      x.pidx = i + 1;
+    });
 
     const result = {
       playlist: playlist,

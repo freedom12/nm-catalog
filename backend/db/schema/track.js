@@ -27,6 +27,8 @@ module.exports = {
       img_zh_TW TEXT
     );
   `,
+  selectByIds: (ids) =>
+    `SELECT * FROM track WHERE id in (${ids.map((id) => `'${id}'`).join(',')})`,
   selectByGid: () => `SELECT * FROM track WHERE gid = ? ORDER BY idx`,
   insert: (lang) => {
     lang = lang.replace('-', '_');

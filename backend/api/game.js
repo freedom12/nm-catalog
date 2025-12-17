@@ -14,7 +14,7 @@ function getGameList(groupBy = '') {
 
 function getGameByYear() {
   return new Promise(async (resolve, reject) => {
-    const fileName = 'res-year.json';
+    const fileName = rw.paths['res_game_year.json'];
     const data = rw.readText(fileName);
 
     if (!data) {
@@ -79,7 +79,7 @@ router.get('/recent', (_, res) => {
 });
 
 router.get('/hardware', async (_, res) => {
-  const fileName = 'res-platform.json';
+  const fileName = rw.paths['res_game_platform.json'];
   const data = rw.readText(fileName);
 
   if (!data) {
