@@ -96,9 +96,7 @@ const computedGameGroups = computed(() =>
     })),
   }))
 );
-const computedGroupNames = computed(() =>
-  computedGameGroups.value.map((x) => x.name.toString())
-);
+const computedGroupNames = computed(() => computedGameGroups.value.map((x) => x.name));
 
 onMounted(async () => {
   await onGroupByChange();

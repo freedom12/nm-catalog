@@ -11,6 +11,7 @@ const routes = [
   { path: '/playlist/:pid', component: PlaylistComponent },
   { path: '/playlist-section', component: PlaylistSectionComponent },
   // { path: '/upload', component: UploadComponent },
+  { path: '/:pathMatch(.*)*', redirect: '/' },
 ];
 
 const router = createRouter({

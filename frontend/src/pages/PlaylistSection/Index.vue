@@ -34,7 +34,7 @@ onMounted(async () => {
         id: playlistData.id,
         type: playlistData.type as PlaylistType,
         tracksnum: playlistData.tracksNum,
-        isRelatedGame: 0,
+        isrelatedgame: 0,
         title_de_DE: name,
         title_en_US: name,
         title_es_ES: name,

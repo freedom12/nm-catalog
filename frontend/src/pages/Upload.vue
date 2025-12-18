@@ -70,8 +70,8 @@ const uploadFiles = async () => {
       files.value = [];
       fileInput.value.value = '';
     }
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     alert('Upload failed.');
   } finally {
     loading.value = false;

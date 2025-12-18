@@ -1,24 +1,6 @@
-import type { Game, Playlist, Track } from './common';
-
-export interface GameGroup {
-  name: string;
-  games: Game[];
-}
-
-export interface GameDetail {
-  game: Game;
-  tracks: Track[];
-  playlists: Playlist[];
-  relateds: Game[];
-}
-
-export interface PlaylistTrack extends Track {
-  pidx: number;
-  game?: Game;
-}
-
-export interface PlaylistDetail {
-  playlist: Playlist;
-  games?: Game[];
-  tracks: PlaylistTrack[];
-}
+export type {
+  GameGroup,
+  GameDetail,
+  PlaylistTrack,
+  PlaylistDetail,
+} from '@nm-catalog/shared';

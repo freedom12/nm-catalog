@@ -7,9 +7,9 @@ export const useRequest = () => {
     loading.value = true;
     try {
       return await promise;
-    } catch (err) {
-      console.error(err);
-      throw err;
+    } catch (error) {
+      console.error(error);
+      throw error;
     } finally {
       loading.value = false;
     }
