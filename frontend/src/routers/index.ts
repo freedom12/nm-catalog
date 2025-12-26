@@ -1,15 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeComponent from '@/pages/Home';
-import GameComponent from '@/pages/Game';
-import PlaylistComponent from '@/pages/Playlist';
-import PlaylistSectionComponent from '@/pages/PlaylistSection';
+import GameListComponent from '@/pages/Game/List/Index.vue';
+import GameDetailComponent from '@/pages/Game/Detail/Index.vue';
+import PlaylistListComponent from '@/pages/Playlist/List/Index.vue';
+import PlaylistDetailComponent from '@/pages/Playlist/Detail/Index.vue';
 // import UploadComponent from '@/pages/Upload.vue';
+import { CACHENAME } from '@/types';
 
 const routes = [
-  { path: '/', component: HomeComponent },
-  { path: '/game/:gid', component: GameComponent },
-  { path: '/playlist/:pid', component: PlaylistComponent },
-  { path: '/playlist-section', component: PlaylistSectionComponent },
+  {
+    path: '/',
+    redirect: () => {
+      const first = localStorage.getItem(CACHENAME.FIRST);
+      return first ?? '/game';
+    },
+  },
+  { path: '/game', component: GameListComponent },
+  { path: '/game/:gid', component: GameDetailComponent },
+  { path: '/playlist', component: PlaylistListComponent },
+  { path: '/playlist/:pid', component: PlaylistDetailComponent },
   // { path: '/upload', component: UploadComponent },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ];
@@ -24,6 +32,12 @@ const router = createRouter({
       return { top: 0 };
     }
   },
+});
+
+router.afterEach(({ path }) => {
+  if (['/game', '/playlist'].includes(path)) {
+    localStorage.setItem(CACHENAME.FIRST, path);
+  }
 });
 
 export default router;

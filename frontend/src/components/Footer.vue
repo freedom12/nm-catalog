@@ -8,7 +8,6 @@
         </option>
       </select>
       <span @click.stop="scrollToTop()">Top ↑</span>
-      <span @click.stop="goSectionGroup()">其他播放列表</span>
     </label>
   </footer>
 </template>
@@ -18,7 +17,6 @@ import { onMounted, ref } from 'vue';
 import { LangCode, type LangCodeValue } from '@/types';
 import { useStore } from '@/stores';
 import { scrollToY } from '@/utils/dom-utils';
-import router from '@/routers';
 
 const store = useStore();
 const langList = Object.values(LangCode);
@@ -35,11 +33,6 @@ function onLangChange(event: Event) {
 
 function scrollToTop() {
   scrollToY(0);
-}
-
-// 临时放在这里
-function goSectionGroup() {
-  router.push(`/playlist-section`);
 }
 </script>
 

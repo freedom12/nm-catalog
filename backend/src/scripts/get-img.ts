@@ -87,7 +87,6 @@ for (const lang of langs) {
   );
   fs.mkdirSync(originalDir, { recursive: true });
   fs.mkdirSync(compressedDir, { recursive: true });
-  console.log(compressedDir);
 
   tasks.push({
     lang: lang,

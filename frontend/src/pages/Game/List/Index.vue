@@ -63,9 +63,9 @@ import { useImgMap } from '@/composables/useImgMap';
 import { useLocalizationString } from '@/composables/useLocalizationString';
 import Header from '@/components/Header.vue';
 import Container from '@/components/Container.vue';
-import SideNav from '@/components/SideNav';
+import SideNav from '@/components/SideNav/Index.vue';
 import SvgIcon from '@/components/SvgIcon.vue';
-import { GameGroupBy, type GameGroup } from '@/types';
+import { CACHENAME, GameGroupBy, type GameGroup } from '@/types';
 import { getGames } from '@/api';
 
 defineOptions({ name: 'Home' });
@@ -123,14 +123,14 @@ async function getGamesByGroup(groupBy: GameGroupBy): Promise<GameGroup[]> {
 async function onGroupByChange(event?: Event) {
   let value = '';
   if (!event) {
-    const cache = localStorage.getItem('groupBy') || '';
+    const cache = localStorage.getItem(CACHENAME.GAME_GROUPBY) || '';
     value = Object.keys(GameGroupBy).includes(cache) ? cache : groupBy.value;
     groupBy.value = value as GameGroupBy;
   } else {
     value = (event.target as HTMLSelectElement).value;
   }
   gameGroups.value = await getGamesByGroup(value as GameGroupBy);
-  localStorage.setItem('groupBy', value);
+  localStorage.setItem(CACHENAME.GAME_GROUPBY, value);
   currentGroup.value = gameGroups.value[0].name;
 
   groupRefs.value = [];
