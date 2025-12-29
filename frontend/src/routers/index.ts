@@ -4,13 +4,13 @@ import GameDetailComponent from '@/pages/Game/Detail/Index.vue';
 import PlaylistListComponent from '@/pages/Playlist/List/Index.vue';
 import PlaylistDetailComponent from '@/pages/Playlist/Detail/Index.vue';
 // import UploadComponent from '@/pages/Upload.vue';
-import { CACHENAME } from '@/types';
+import { STORAGE_KEY } from '@/types';
 
 const routes = [
   {
     path: '/',
     redirect: () => {
-      const first = localStorage.getItem(CACHENAME.FIRST);
+      const first = localStorage.getItem(STORAGE_KEY.FIRST);
       return first ?? '/game';
     },
   },
@@ -36,7 +36,7 @@ const router = createRouter({
 
 router.afterEach(({ path }) => {
   if (['/game', '/playlist'].includes(path)) {
-    localStorage.setItem(CACHENAME.FIRST, path);
+    localStorage.setItem(STORAGE_KEY.FIRST, path);
   }
 });
 
