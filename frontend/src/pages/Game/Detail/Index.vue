@@ -102,12 +102,16 @@ const computedSections = computed(() => {
 useHeader(() => ({
   observeRef: titleRef.value,
   data: data.value,
-  template:
-    data.value &&
-    h('span', [
-      computedTitle.value,
-      h('small', ` (${data.value.game.year}) | ${data.value.game.hardware}`),
-    ]),
+  template: () => {
+    if (data.value) {
+      return h('span', [
+        computedTitle.value,
+        h('small', ` (${data.value.game.year}) | ${data.value.game.hardware}`),
+      ]);
+    } else {
+      return h('span');
+    }
+  },
 }));
 
 onMounted(async () => {
