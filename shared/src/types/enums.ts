@@ -12,19 +12,15 @@ export const LangCode = {
 export type LangCode = keyof typeof LangCode;
 export type LangCodeValue = (typeof LangCode)[keyof typeof LangCode];
 
-export const GameGroupBy = {
-  PLATFORM: 'Group by Platform',
-  RELEASE: 'Group by Release Year',
-  ADDED: 'Sort by Latest',
-} as const;
-export type GameGroupBy = keyof typeof GameGroupBy;
+export const GameGroupBy = ['PLATFORM', 'RELEASE', 'ADDED'] as const;
+export type GameGroupBy = (typeof GameGroupBy)[number];
 
-export const PlaylistType = {
-  SINGLE_GAME_ALL: 'Single-Game: All Tracks',
-  BEST: 'Single-Game: Top Tracks',
-  LOOP: 'Single-Game: Extended Tracks',
-  SINGLE_GAME: 'Single-Game: Theme Playlist',
-  MULTIPLE: 'Multi-Game: Related Playlist',
-  SPECIAL: 'Special Playlist',
-};
-export type PlaylistType = keyof typeof PlaylistType;
+export const PlaylistType = [
+  'SINGLE_GAME_ALL',
+  'BEST',
+  'LOOP',
+  'SINGLE_GAME',
+  'MULTIPLE',
+  'SPECIAL',
+] as const;
+export type PlaylistType = (typeof PlaylistType)[number];

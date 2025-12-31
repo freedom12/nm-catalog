@@ -28,10 +28,13 @@
           v-for="item in computedSections"
           :key="item.key"
           class="tab"
-          :class="{ active: gameDataSection === item.key, blank: !item.len }"
+          :class="{
+            active: gameDataSection === item.key,
+            blank: /^0/.test(item.label),
+          }"
           @click.stop="gameDataSection = item.key"
         >
-          {{ item.len }} {{ item.label }}
+          {{ item.label }}
         </div>
       </nav>
       <section class="detail">
@@ -52,6 +55,7 @@
 
 <script setup lang="ts">
 import { computed, h, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { useLangStore } from '@/stores';
 import { useHeader } from '@/composables/useHeader';
@@ -66,12 +70,13 @@ import { GameDataSection, type GameDetail } from '@/types';
 import { getGameDetail } from '@/api';
 import { isShowTitle, openSourceImg } from '@/utils/data-utils';
 
+const { t } = useI18n();
 const route = useRoute();
-const gid = route.params.gid as string;
 const langStore = useLangStore();
 const { loading, request } = useRequest();
 const imgMap = useImgMap();
 const stringMap = useLocalizationString();
+const gid = route.params.gid as string;
 const data = ref<GameDetail>();
 const gameDataSection = ref<GameDataSection>('TRACK');
 const titleRef = ref<HTMLElement>();
@@ -82,12 +87,13 @@ const computedLangs = computed(() =>
 );
 const computedSections = computed(() => {
   const result = [];
-  for (const [key, value] of Object.entries(GameDataSection)) {
-    const propName = `${key.toLowerCase()}s`;
+  for (const section of GameDataSection) {
+    const propName = `${section.toLowerCase()}s`;
     result.push({
-      key: key as GameDataSection,
-      label: value,
-      len: (data.value as any)[propName]?.length ?? 0,
+      key: section,
+      label: t(`game.dataSection.${section}`, {
+        count: (data.value as any)[propName]?.length ?? 0,
+      }),
     });
   }
   return result;
@@ -100,7 +106,7 @@ useHeader(() => ({
     data.value &&
     h('span', [
       computedTitle.value,
-      h('small', `${data.value.game.year} | ${data.value.game.hardware}`),
+      h('small', ` (${data.value.game.year}) | ${data.value.game.hardware}`),
     ]),
 }));
 

@@ -2,12 +2,12 @@
   <section :hidden="hidden">
     <div class="radio-group">
       <label
-        v-for="(label, key) in TrackMode"
-        :key="key"
-        :class="{ disabled: !getTrackCount(key) }"
+        v-for="tag in computedTrackTags"
+        :key="tag.key"
+        :class="{ disabled: !tag.count }"
       >
-        <input type="radio" :value="key" v-model="trackMode" />
-        <span>{{ label }} ({{ getTrackCount(key) }})</span>
+        <input type="radio" :value="tag.key" v-model="selectedTrackTag" />
+        <span>{{ t(`track.tag.${tag.key}`) }} ({{ tag.count }})</span>
       </label>
     </div>
     <TrackItem
@@ -15,25 +15,36 @@
       :key="track.id"
       :data="track"
       :hidden="
-        (trackMode === 'TOP' && !track.isbest) || (trackMode === 'LOOP' && !track.isloop)
+        (selectedTrackTag === 'TOP' && !track.isbest) ||
+        (selectedTrackTag === 'LOOP' && !track.isloop)
       "
     ></TrackItem>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import TrackItem from '@/components/TrackItem.vue';
-import { TrackMode, type Track } from '@/types';
+import { TrackTag, type Track } from '@/types';
 
 const props = defineProps<{
   hidden: boolean;
   data: Track[];
 }>();
 
-const trackMode = ref<TrackMode>('ALL');
+const { t } = useI18n();
+const selectedTrackTag = ref<TrackTag>('ALL');
 
-function getTrackCount(mode: TrackMode): number {
+const computedTrackTags = computed(() => {
+  return TrackTag.map((x) => ({
+    key: x,
+    label: t(`track.tag.${x}`),
+    count: getTrackCount(x),
+  }));
+});
+
+function getTrackCount(mode: TrackTag): number {
   switch (mode) {
     case 'ALL':
       return props.data.length;

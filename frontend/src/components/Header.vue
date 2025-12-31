@@ -1,5 +1,5 @@
 <template>
-  <header id="header" :class="{ detail: !refVisible }">
+  <header id="header" :class="{ detail: observeRef && !refVisible }">
     <template v-if="!observeRef || (observeRef && refVisible)">{{ title }}</template>
     <template v-else> <slot></slot> </template>
   </header>
@@ -8,6 +8,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 // import { useI18n } from 'vue-i18n';
+// import { useLangStore } from '@/stores';
 import { MAIN_TITLE } from '@/types';
 import { ElementTracker } from '@/utils/element-tracker';
 
@@ -24,7 +25,6 @@ const tracker = new ElementTracker((entries) => {
   const entry = entries[0];
   refVisible.value = entry.isIntersecting;
 });
-
 // const { t } = useI18n();
 
 watch(

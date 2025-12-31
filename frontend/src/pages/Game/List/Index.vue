@@ -1,8 +1,17 @@
 <template>
   <div id="select">
-    <select name="groupby" v-model="groupBy" @change="onGroupByChange" ref="selectRef">
-      <option v-for="(label, key) in GameGroupBy" :key="key" :value="key">
-        {{ label }}
+    <select
+      name="groupby"
+      v-model="selectedGroupBy"
+      @change="onGroupByChange"
+      ref="selectRef"
+    >
+      <option
+        v-for="groupBy in computedGameGroupBy"
+        :key="groupBy.value"
+        :value="groupBy.value"
+      >
+        {{ groupBy.label }}
       </option>
     </select>
   </div>
@@ -31,7 +40,7 @@
       <SideNav
         :target="groupRefs"
         :options="computedGroupNames"
-        :step="groupBy === 'RELEASE' ? 5 : 1"
+        :step="selectedGroupBy === 'RELEASE' ? 5 : 1"
         v-model:title="currentGroup"
         v-if="computedGameGroups.length"
       >
@@ -40,12 +49,12 @@
           <div>
             <ul>
               <li
-                v-for="(label, key) in GameGroupBy"
-                :key="key"
-                :class="{ active: groupBy === key }"
-                @click.stop="changeGroupBy(key)"
+                v-for="groupBy in computedGameGroupBy"
+                :key="groupBy.value"
+                :class="{ active: selectedGroupBy === groupBy.value }"
+                @click.stop="changeGroupBy(groupBy.value)"
               >
-                <span>{{ label }}</span>
+                <span>{{ groupBy.label }}</span>
               </li>
             </ul>
           </div>
@@ -57,6 +66,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useHeader } from '@/composables/useHeader';
 import { useRequest } from '@/composables/useRequest';
 import { useImgMap } from '@/composables/useImgMap';
@@ -67,22 +77,30 @@ import SvgIcon from '@/components/SvgIcon.vue';
 import { STORAGE_KEY, GameGroupBy, type GameGroup } from '@/types';
 import { getGames } from '@/api';
 
+const { t } = useI18n();
 const { loading, request } = useRequest();
 const imgMap = useImgMap();
 const stringMap = useLocalizationString();
-const gameDict: {
-  [key in GameGroupBy]: { key: 'hardware' | 'release' | 'recent'; content: GameGroup[] };
-} = {
+const gameDict: Record<
+  GameGroupBy,
+  { key: 'hardware' | 'release' | 'recent'; content: GameGroup[] }
+> = {
   PLATFORM: { key: 'hardware', content: [] },
   RELEASE: { key: 'release', content: [] },
   ADDED: { key: 'recent', content: [] },
 };
-const groupBy = ref<GameGroupBy>('PLATFORM');
+const selectedGroupBy = ref<GameGroupBy>('PLATFORM');
 const gameGroups = ref<GameGroup[]>([]);
 const currentGroup = ref<string>();
 const selectRef = ref<HTMLElement>();
 const groupRefs = ref<HTMLElement[]>([]);
 
+const computedGameGroupBy = computed(() => {
+  return GameGroupBy.map((x) => ({
+    label: t(`game.groupBy.${x}`),
+    value: x,
+  }));
+});
 const computedGameGroups = computed(() =>
   gameGroups.value.map((x) => ({
     ...x,
@@ -122,9 +140,9 @@ async function getGamesByGroup(groupBy: GameGroupBy): Promise<GameGroup[]> {
 async function onGroupByChange(event?: Event) {
   let value = '';
   if (!event) {
-    const cache = localStorage.getItem(STORAGE_KEY.GAME_GROUPBY) || '';
-    value = Object.keys(GameGroupBy).includes(cache) ? cache : groupBy.value;
-    groupBy.value = value as GameGroupBy;
+    const cache = localStorage.getItem(STORAGE_KEY.GAME_GROUPBY);
+    value = cache ?? selectedGroupBy.value;
+    selectedGroupBy.value = value as GameGroupBy;
   } else {
     value = (event.target as HTMLSelectElement).value;
   }

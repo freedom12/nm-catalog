@@ -1,7 +1,7 @@
 <template>
   <section :hidden="hidden">
-    <template v-for="group in groupedPlaylists" :key="group.type">
-      <h3>{{ group.type }}</h3>
+    <template v-for="group in computedPlaylistGroups" :key="group.label">
+      <h3>{{ group.label }}</h3>
       <ul>
         <li v-for="playlist in group.playlists" :key="playlist.id">
           <PlaylistCard :playlist="playlist" />
@@ -13,7 +13,8 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { type PlaylistType, type Playlist } from '@/types';
+import { useI18n } from 'vue-i18n';
+import type { Playlist } from '@/types';
 import PlaylistCard from '@/components/PlaylistCard.vue';
 
 const props = defineProps<{
@@ -21,33 +22,23 @@ const props = defineProps<{
   data: Playlist[];
 }>();
 
-const groupedPlaylists = computed(() => {
-  const groups = new Map<string, Playlist[]>();
+const { t } = useI18n();
 
-  props.data.forEach((playlist) => {
-    const type = getPlaylistTypeLabel(playlist.type);
-    if (!groups.has(type)) {
-      groups.set(type, []);
+const computedPlaylistGroups = computed(() => {
+  const groupMap = new Map<string, Playlist[]>();
+  props.data.forEach((x) => {
+    const label = t(`game.playlist.${x.type}`, {}, { default: '' });
+    if (!groupMap.has(label)) {
+      groupMap.set(label, []);
     }
-    groups.get(type)!.push(playlist);
+    groupMap.get(label)!.push(x);
   });
 
-  return Array.from(groups.entries()).map(([type, playlists]) => ({
-    type: !type ? type : `${type}s`,
+  return Array.from(groupMap.entries()).map(([label, playlists]) => ({
+    label,
     playlists,
   }));
 });
-
-function getPlaylistTypeLabel(playlistType: PlaylistType): string {
-  switch (playlistType) {
-    case 'MULTIPLE':
-      return 'Related Playlist';
-    case 'SINGLE_GAME':
-      return 'Self Theme Playlist';
-    default:
-      return '';
-  }
-}
 </script>
 
 <style lang="scss" scoped>

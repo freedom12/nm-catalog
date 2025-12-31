@@ -1,22 +1,26 @@
 import { defineStore } from 'pinia';
 import { STORAGE_KEY, DEFAULT_LANG, type LangCodeValue } from '@/types';
-import { i18n, loadLocaleMessage, SUPPORT_LOCALES, type Locale } from '@/i18n';
+import { i18n, loadLocaleMessage, SUPPORT_LOCALES, type LocaleType } from '@/i18n';
 
-const getLocale = (): Locale => {
-  const cache = localStorage.getItem(STORAGE_KEY.LOCALE);
-  if (cache) {
-    return cache as Locale;
-  } else {
-    const navLang = navigator.language;
-    if ((SUPPORT_LOCALES as unknown as string[]).includes(navLang)) {
-      return navLang as Locale;
+export const getLocale = (locale?: LocaleType): LocaleType => {
+  if (!locale) {
+    const cache = localStorage.getItem(STORAGE_KEY.LOCALE);
+    if (cache) {
+      return cache as LocaleType;
     } else {
-      if (navLang.includes('zh')) {
-        return 'zh-CN';
+      const navLang = navigator.language;
+      if ((SUPPORT_LOCALES as unknown as string[]).includes(navLang)) {
+        return navLang as LocaleType;
       } else {
-        return DEFAULT_LANG;
+        if (navLang.includes('zh')) {
+          return 'zh-CN';
+        } else {
+          return DEFAULT_LANG;
+        }
       }
     }
+  } else {
+    return SUPPORT_LOCALES.includes(locale) ? locale : DEFAULT_LANG;
   }
 };
 
@@ -27,7 +31,7 @@ export const useLangStore = defineStore('lang', {
     langList: [] as LangCodeValue[],
   }),
   actions: {
-    async setLocale(locale: Locale, isManual = false) {
+    async setLocale(locale: LocaleType, isManual = false) {
       await loadLocaleMessage(locale);
       i18n.global.locale.value = locale;
       this.locale = locale;
