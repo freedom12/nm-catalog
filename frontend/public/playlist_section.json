@@ -1,5 +1,31 @@
 {
+    "来听听年度精选吧": [
+        {
+            "description": "收集了2024年添加的游戏软件的乐曲。",
+            "id": "09163a35-7b78-47b9-a59b-ae0f62427051",
+            "name": "2024精选",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/ede04891-1e17-4bae-85b2-bc59e7a06e9d",
+            "tracksNum": 32,
+            "type": "MULTIPLE"
+        },
+        {
+            "description": "收集了2025年添加的游戏软件的乐曲。",
+            "id": "e9ac5940-dffb-465b-95fb-5d72bafb19b9",
+            "name": "2025精选",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/36128539-fcf5-4165-b4f6-ef2ff0d33510",
+            "tracksNum": 82,
+            "type": "MULTIPLE"
+        }
+    ],
     "特别发布": [
+        {
+            "description": "特别发布《密特罗德 究极4 穿越未知》的7首乐曲。",
+            "id": "9a8634d9-5a82-4e48-a41c-13125b5263d0",
+            "name": "特别发布《密特罗德 究极4 穿越未知》",
+            "thumbnailURL": "https://image-assets.m.nintendo.com/5fb965f5-6dae-4373-ab95-2879580e262e",
+            "tracksNum": 7,
+            "type": "SPECIAL"
+        },
         {
             "description": "先行发布《卡比的驭天飞行者》的11首乐曲。",
             "id": "240a1c69-d321-4d65-9c55-f48eb9b7ad03",
@@ -25,7 +51,7 @@
             "type": "SPECIAL"
         }
     ],
-    "听听看吧":[
+    "听听看吧": [
         {
             "description": "从收录到Nintendo Music的游戏软件中，挑选了最值得推荐的乐曲。※乐曲的顺序每天都会变化。",
             "id": "e31b2abb-32c8-4d01-9e8c-83629ff792e3",
@@ -83,7 +109,7 @@
             "type": "MULTIPLE"
         }
     ],
-    "从现在的心情开始":[
+    "从现在的心情开始": [
         {
             "description": "挑选了适合放松身心时聆听的舒缓乐曲。※乐曲的顺序每天都会变化。",
             "id": "63c0d96f-8447-43f9-9159-0946aba5a780",
@@ -181,7 +207,7 @@
             "type": "MULTIPLE"
         }
     ],
-    "从游戏中的场景开始":[
+    "从游戏中的场景开始": [
         {
             "description": "※乐曲的顺序每天都会变化。",
             "id": "4f3cdaff-c0ba-4381-bd24-d85e1783a26f",
