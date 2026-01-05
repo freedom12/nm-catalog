@@ -52,8 +52,6 @@ function scrollToTop() {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables.scss' as *;
-
 #top-mark {
   position: absolute;
   top: 0;

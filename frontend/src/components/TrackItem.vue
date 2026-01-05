@@ -55,7 +55,6 @@ const computedLangs = computed(() =>
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables.scss' as *;
 .tag {
   position: absolute;
   top: 0.45em;

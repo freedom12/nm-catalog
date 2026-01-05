@@ -1,0 +1,15 @@
+@use 'sass:list';
+
+@mixin transition($props, $duration: 0.3s, $timing: ease) {
+  @if list.length($props) > 0 {
+    $transitions: ();
+
+    @each $prop in $props {
+      $transitions: list.append($transitions, #{$prop} #{$duration} #{$timing}, comma);
+    }
+
+    transition: $transitions;
+  } @else {
+    transition: all $duration $timing;
+  }
+}

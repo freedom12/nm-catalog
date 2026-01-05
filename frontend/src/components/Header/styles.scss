@@ -1,4 +1,3 @@
-@use '@/styles/variables.scss' as *;
 $headerHeight: 48px;
 
 header {
@@ -17,21 +16,16 @@ header {
   height: $headerHeight;
   padding: 0 1.5rem;
   background-color: $header-bgColor;
-
   color: $header-textColor;
   opacity: 1;
-  // transition: all 0.3s ease;
   font: bold 1rem 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  line-height: 2.3em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 
   .brand {
     display: inline-flex;
     background-color: $header-bgColor;
     font-family: Inter, system-ui, -apple-system, sans-serif;
     font-size: 1.05rem;
+    line-height: 2em;
     cursor: pointer;
 
     > img {
@@ -54,7 +48,7 @@ header {
       padding: 0 0.75rem;
       color: white;
       opacity: 0.7;
-      transition: all 0.3s ease;
+      @include transition((border-color, opacity));
       line-height: $headerHeight;
       font-size: 0.9rem;
 
@@ -78,7 +72,7 @@ header {
   text-align: center;
   line-height: 2rem;
   overflow: hidden;
-  transition: all 0.3s ease;
+  @include transition((opacity, transform));
 
   &.active {
     transform: translateY($headerHeight);
@@ -100,7 +94,7 @@ header {
 
 @media (prefers-color-scheme: light) {
   header {
-    &:last-child {
+    &:last-of-type {
       box-shadow: 0 0 1.5rem 1rem rgba($root-bgColor-light, 0.7);
     }
   }
@@ -148,7 +142,7 @@ header {
       background-color: rgba($header-bgColor, 0.9);
       opacity: 0;
       transform: translateX(100%);
-      transition: all 0.3s ease;
+      @include transition((opacity, transform));
 
       > a {
         display: block;

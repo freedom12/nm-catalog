@@ -42,8 +42,6 @@ const computedPlaylistGroups = computed(() => {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables.scss' as *;
-
 h2 {
   width: 60%;
   margin-top: 2rem;

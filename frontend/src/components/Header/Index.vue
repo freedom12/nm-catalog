@@ -20,7 +20,7 @@
       </nav>
     </div>
   </header>
-  <header id="subHeader" :class="{ active: observeRef && !refVisible }">
+  <header id="subHeader" v-if="observeRef" :class="{ active: !refVisible }">
     <div class="app-width">
       <slot></slot>
     </div>
