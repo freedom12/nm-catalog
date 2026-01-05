@@ -46,8 +46,6 @@ const existedGameIds: string[] = stmt.game
         )
       )
       .filter((x: DataRow[]) => x.length > 0);
-    // console.log(gameWithYears);
-    // return;
 
     if (!gameWithYears.length) {
       info(`+++++++++ No new game found. +++++++++`);

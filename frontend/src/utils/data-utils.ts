@@ -1,9 +1,9 @@
-import { useStore } from '@/stores';
+import { useLangStore } from '@/stores';
 import { DEFAULT_LANG, type NMData, type Track } from '@/types';
 import { LocalizationString } from './localization-string';
 
 export const isShowTitle = (target: NMData, lang: string): boolean => {
-  const mainLang = useStore().mainLang;
+  const mainLang = useLangStore().mainLang;
   if (lang === DEFAULT_LANG && mainLang !== DEFAULT_LANG) {
     return true;
   }

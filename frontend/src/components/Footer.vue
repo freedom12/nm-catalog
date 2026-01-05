@@ -1,50 +1,65 @@
 <template>
+  <div id="top-mark" ref="topRef"></div>
   <footer id="footer">
     <label>
-      Main Language:
+      {{ t('info.lang') }}:
       <select name="lang" v-model="mainLang" @change="onLangChange">
         <option v-for="lang in langList" :key="lang" :value="lang">
           {{ lang }}
         </option>
       </select>
-      <span @click.stop="scrollToTop()">Top ↑</span>
-      <span @click.stop="goSectionGroup()">其他播放列表</span>
+      <span :class="{ dim: isScrollTop }" @click.stop="scrollToTop()"
+        >{{ t('info.top') }} ↑</span
+      >
     </label>
   </footer>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { LangCode, type LangCodeValue } from '@/types';
-import { useStore } from '@/stores';
+import { getLocale, useLangStore } from '@/stores';
 import { scrollToY } from '@/utils/dom-utils';
-import router from '@/routers';
+import { ElementTracker } from '@/utils/element-tracker';
+import type { LocaleType } from '@/i18n';
 
-const store = useStore();
+const { t } = useI18n();
+const langStore = useLangStore();
 const langList = Object.values(LangCode);
-const mainLang = ref<LangCodeValue>(store.mainLang);
+const mainLang = ref<LangCodeValue>(langStore.mainLang);
+const topRef = ref<HTMLElement>();
+const isScrollTop = ref<boolean>(false);
+const tracker = new ElementTracker((entries) => {
+  const entry = entries[0];
+  isScrollTop.value = entry.isIntersecting;
+});
 
 onMounted(async () => {
-  store.setLangList(langList);
+  langStore.setLangList(langList);
+  tracker.observe(topRef.value as unknown as HTMLElement);
 });
 
 function onLangChange(event: Event) {
   const value = (event.target as HTMLSelectElement).value;
-  store.setMainLang(value as LangCodeValue);
+  langStore.setMainLang(value as LangCodeValue);
+  langStore.setLocale(getLocale(value as LocaleType), true);
 }
 
 function scrollToTop() {
   scrollToY(0);
 }
-
-// 临时放在这里
-function goSectionGroup() {
-  router.push(`/playlist-section`);
-}
 </script>
 
 <style lang="scss" scoped>
 @use '@/styles/variables.scss' as *;
+
+#top-mark {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 1px;
+}
 
 #footer {
   position: fixed;
@@ -56,11 +71,17 @@ function goSectionGroup() {
   justify-content: center;
   height: 3em;
   background-color: rgba($footer-bgColor, 0.8);
+  font-size: small;
 
   span {
-    display: inline-block;
-    margin-left: 3rem;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 2rem;
     cursor: pointer;
+
+    &.dim {
+      opacity: 0.5;
+    }
   }
 }
 

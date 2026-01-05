@@ -1,0 +1,44 @@
+{
+  "hello": "你好",
+  "common": {
+    "game": "游戏",
+    "playlist": "播放列表"
+  },
+  "game": {
+    "groupBy": {
+      "PLATFORM": "按平台分组",
+      "RELEASE": "按发行年份分组",
+      "ADDED": "按最新添加排序"
+    },
+    "dataSection": {
+      "TRACK": "{count} 首乐曲",
+      "PLAYLIST": "{count} 个相关播放列表",
+      "RELATED": "{count} 个相关游戏"
+    },
+    "playlist": {
+      "SINGLE_GAME": "主题播放列表",
+      "MULTIPLE": "关联播放列表"
+    }
+  },
+  "track": {
+    "tag": {
+      "ALL": "所有",
+      "TOP": "精选",
+      "LOOP": "支持更改时长"
+    }
+  },
+  "playlist": {
+    "type": {
+      "SINGLE_GAME_ALL": "《{gameTitle}》所有乐曲",
+      "BEST": "《{gameTitle}》精选乐曲",
+      "LOOP": "《{gameTitle}》中可更改时长的乐曲",
+      "SINGLE_GAME": "《{gameTitle}》主题播放列表",
+      "MULTIPLE": "多游戏播放列表",
+      "SPECIAL": "特别发布"
+    }
+  },
+  "info": {
+    "lang": "首选语言",
+    "top": "回到顶部"
+  }
+}

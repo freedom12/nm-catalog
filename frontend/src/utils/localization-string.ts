@@ -1,4 +1,4 @@
-import { useStore } from '@/stores';
+import { useLangStore } from '@/stores';
 import { DEFAULT_LANG, LangCode, type NMData } from '@/types';
 
 export class LocalizationString {
@@ -48,7 +48,7 @@ export class LocalizationString {
   }
 
   static convertLangCode(langCode?: string): string {
-    langCode = langCode ? langCode : useStore().mainLang;
+    langCode = langCode ? langCode : useLangStore().mainLang;
     return langCode.replace('-', '_');
   }
 }

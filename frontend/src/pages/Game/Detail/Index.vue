@@ -1,10 +1,4 @@
 <template>
-  <Header :observeRef="titleRef">
-    <template v-if="data">
-      {{ computedTitle }}
-      <small>({{ data.game.year }} | {{ data.game.hardware }})</small>
-    </template>
-  </Header>
   <Container :loading="loading">
     <main id="main" v-if="data">
       <section class="common-detail">
@@ -12,7 +6,7 @@
           <img
             v-fallback
             :src="imgMap.getPath('game', data.game)"
-            @click.stop="openSourceImg(data.game, store.mainLang)"
+            @click.stop="openSourceImg(data.game, langStore.mainLang)"
             loading="lazy"
           />
         </div>
@@ -34,10 +28,13 @@
           v-for="item in computedSections"
           :key="item.key"
           class="tab"
-          :class="{ active: gameDataSection === item.key, blank: !item.len }"
+          :class="{
+            active: gameDataSection === item.key,
+            blank: /^0/.test(item.label),
+          }"
           @click.stop="gameDataSection = item.key"
         >
-          {{ item.len }} {{ item.label }}
+          {{ item.label }}
         </div>
       </nav>
       <section class="detail">
@@ -57,13 +54,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, h, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import { useStore } from '@/stores';
+import { useLangStore } from '@/stores';
+import { useHeader } from '@/composables/useHeader';
 import { useRequest } from '@/composables/useRequest';
 import { useImgMap } from '@/composables/useImgMap';
 import { useLocalizationString } from '@/composables/useLocalizationString';
-import Header from '@/components/Header.vue';
 import Container from '@/components/Container.vue';
 import Track from './components/Track.vue';
 import Related from './components/Related.vue';
@@ -72,34 +70,49 @@ import { GameDataSection, type GameDetail } from '@/types';
 import { getGameDetail } from '@/api';
 import { isShowTitle, openSourceImg } from '@/utils/data-utils';
 
-defineOptions({ name: 'Game' });
-
+const { t } = useI18n();
 const route = useRoute();
-const gid = route.params.gid as string;
-const store = useStore();
+const langStore = useLangStore();
 const { loading, request } = useRequest();
 const imgMap = useImgMap();
 const stringMap = useLocalizationString();
+const gid = route.params.gid as string;
 const data = ref<GameDetail>();
 const gameDataSection = ref<GameDataSection>('TRACK');
 const titleRef = ref<HTMLElement>();
 
 const computedTitle = computed(() => stringMap.getString(data.value!.game, 'title'));
 const computedLangs = computed(() =>
-  store.langList.filter((x) => isShowTitle(data.value!.game, x))
+  langStore.langList.filter((x) => isShowTitle(data.value!.game, x))
 );
 const computedSections = computed(() => {
   const result = [];
-  for (const [key, value] of Object.entries(GameDataSection)) {
-    const propName = `${key.toLowerCase()}s`;
+  for (const section of GameDataSection) {
+    const propName = `${section.toLowerCase()}s`;
     result.push({
-      key: key as GameDataSection,
-      label: value,
-      len: (data.value as any)[propName]?.length ?? 0,
+      key: section,
+      label: t(`game.dataSection.${section}`, {
+        count: (data.value as any)[propName]?.length ?? 0,
+      }),
     });
   }
   return result;
 });
+
+useHeader(() => ({
+  observeRef: titleRef.value,
+  data: data.value,
+  template: () => {
+    if (data.value) {
+      return h('span', [
+        computedTitle.value,
+        h('small', ` (${data.value.game.year}) | ${data.value.game.hardware}`),
+      ]);
+    } else {
+      return h('span');
+    }
+  },
+}));
 
 onMounted(async () => {
   await getDetail();

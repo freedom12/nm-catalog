@@ -6,7 +6,7 @@
           <img
             v-fallback
             :src="imgMap.getPath('game', relate)"
-            @click.stop="openSourceImg(relate, store.mainLang)"
+            @click.stop="openSourceImg(relate, langStore.mainLang)"
             loading="lazy"
           />
         </div>
@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from '@/stores';
+import { useLangStore } from '@/stores';
 import { useImgMap } from '@/composables/useImgMap';
 import { useLocalizationString } from '@/composables/useLocalizationString';
 import type { Game } from '@/types';
@@ -35,7 +35,7 @@ defineProps<{
   data: Game[];
 }>();
 
-const store = useStore();
+const langStore = useLangStore();
 const imgMap = useImgMap();
 const stringMap = useLocalizationString();
 </script>

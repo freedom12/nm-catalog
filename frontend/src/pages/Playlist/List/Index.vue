@@ -1,5 +1,4 @@
 <template>
-  <Header :static="true"></Header>
   <div class="loading" v-if="loading"></div>
   <main id="main" v-else>
     <div class="group" v-for="[name, section] in Object.entries(sections)" :key="name">
@@ -15,12 +14,15 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import Header from '@/components/Header.vue';
+import { useHeader } from '@/composables/useHeader';
 import { PlaylistType, type Playlist } from '@/types';
 import PlaylistCard from '@/components/PlaylistCard.vue';
 
 const loading = ref<boolean>(false);
 const sections = ref<Record<string, Playlist[]>>({});
+
+useHeader();
+
 onMounted(async () => {
   loading.value = true;
   const response = await fetch('/playlist_section.json');
@@ -69,7 +71,6 @@ onMounted(async () => {
   }
   loading.value = false;
 });
-
 </script>
 
 <style scoped>

@@ -1,13 +1,14 @@
 <template>
-  <header id="header" :class="{ detail: !refVisible }" @click.stop="goHome">
-    <template v-if="static || refVisible">{{ title }}</template>
+  <header id="header" :class="{ detail: observeRef && !refVisible }">
+    <template v-if="!observeRef || (observeRef && refVisible)">{{ title }}</template>
     <template v-else> <slot></slot> </template>
   </header>
 </template>
 
 <script setup lang="ts">
-import { nextTick, onActivated, onDeactivated, onMounted, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, watch } from 'vue';
+// import { useI18n } from 'vue-i18n';
+// import { useLangStore } from '@/stores';
 import { MAIN_TITLE } from '@/types';
 import { ElementTracker } from '@/utils/element-tracker';
 
@@ -18,53 +19,24 @@ const props = withDefaults(
   }>(),
   { static: false }
 );
-const router = useRouter();
 const title = MAIN_TITLE;
 const refVisible = ref<boolean>(true);
 const tracker = new ElementTracker((entries) => {
   const entry = entries[0];
   refVisible.value = entry.isIntersecting;
 });
+// const { t } = useI18n();
 
-onMounted(() => {
-  if (!props.static) {
-    const stop = watch(
-      () => props.observeRef,
-      (elRef) => {
-        if (elRef) {
-          tracker.observe(elRef);
-          stop();
-        }
-      },
-      { immediate: true }
-    );
-  }
-});
-
-onActivated(async () => {
-  if (props.static) {
-    return;
-  }
-  if (!props.observeRef) {
-    return;
-  }
-  await nextTick();
-  tracker.reconnect();
-});
-
-onDeactivated(() => {
-  if (props.static) {
-    return;
-  }
-  tracker.disconnect();
-});
-
-function goHome() {
-  if (!refVisible.value) {
-    return;
-  }
-  router.push(`/`);
-}
+watch(
+  () => props.observeRef,
+  (elRef) => {
+    tracker.disconnect();
+    if (elRef) {
+      tracker.observe(elRef);
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style lang="scss" scoped>

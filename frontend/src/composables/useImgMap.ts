@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { DEFAULT_LANG, LangCode, type LangCodeValue, type NMData } from '@/types';
-import { useStore } from '@/stores';
+import { useLangStore } from '@/stores';
 import { LocalizationString } from '@/utils/localization-string';
 import { fallbackSrc } from '@/plugins/fallbackImage';
 
@@ -34,7 +34,7 @@ const api = {
     return api;
   },
   getPath(dataType: DataTypeName, data: NMData, lang?: LangCodeValue): string {
-    const key = `${dataType}:${data.id}:${lang ?? useStore().mainLang}`;
+    const key = `${dataType}:${data.id}:${lang ?? useLangStore().mainLang}`;
     const alterKey = `${dataType}:${data.id}:${DEFAULT_LANG}`;
     return imgMap.value.get(key) ?? imgMap.value.get(alterKey) ?? fallbackSrc;
   },

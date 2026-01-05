@@ -1,6 +1,9 @@
 <template>
+  <Header :observeRef="headerStore.observeRef">
+    <component :is="headerStore.template" :data="headerStore.data" />
+  </Header>
   <RouterView v-slot="{ Component, route }">
-    <keep-alive include="Home,Game,Playlist">
+    <keep-alive>
       <component :is="Component" :key="route.fullPath" />
     </keep-alive>
   </RouterView>
@@ -8,8 +11,9 @@
 </template>
 
 <script setup lang="ts">
+import Header from '@/components/Header.vue';
 import Footer from '@/components/Footer.vue';
-import { MAIN_TITLE } from '@/types';
+import { useHeaderStore } from './stores';
 
-document.title = MAIN_TITLE;
+const headerStore = useHeaderStore();
 </script>

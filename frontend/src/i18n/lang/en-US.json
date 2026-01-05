@@ -1,0 +1,44 @@
+{
+  "hello": "Hello",
+  "common": {
+    "game": "Game",
+    "playlist": "Playlist"
+  },
+  "game": {
+    "groupBy": {
+      "PLATFORM": "Group by Platform",
+      "RELEASE": "Group by Release Year",
+      "ADDED": "Sort by Latest"
+    },
+    "dataSection": {
+      "TRACK": "{count} Track | {count} Tracks",
+      "PLAYLIST": "{count} Related Playlist | {count} Related Playlists",
+      "RELATED": "{count} Related Game | {count} Related Games "
+    },
+    "playlist": {
+      "SINGLE_GAME": "Self Theme Playlist | Self Theme Playlists",
+      "MULTIPLE": "Related Playlist | Related Playlists"
+    }
+  },
+  "track": {
+    "tag": {
+      "ALL": "All",
+      "TOP": "Top",
+      "LOOP": "Extendable"
+    }
+  },
+  "playlist": {
+    "type": {
+      "SINGLE_GAME_ALL": "All Tracks from \"{gameTitle}\"",
+      "BEST": "Top Tracks from \"{gameTitle}\"",
+      "LOOP": "Extended Tracks from \"{gameTitle}\"",
+      "SINGLE_GAME": "Theme Playlist from \"{gameTitle}\"",
+      "MULTIPLE": "Multi-Game Related Playlist",
+      "SPECIAL": "Special Playlist"
+    }
+  },
+  "info": {
+    "lang": "Preferred Language",
+    "top": "Top"
+  }
+}

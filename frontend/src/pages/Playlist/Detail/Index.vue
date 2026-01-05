@@ -1,10 +1,4 @@
 <template>
-  <Header :observeRef="titleRef">
-    <template v-if="data">
-      {{ computedTitle }}
-      <small>({{ PlaylistType[data.playlist.type] }})</small>
-    </template>
-  </Header>
   <Container :loading="loading">
     <main id="main" v-if="data">
       <section class="common-detail">
@@ -12,18 +6,16 @@
           <img
             v-fallback
             :src="imgMap.getPath('playlist', data.playlist)"
-            @click.stop="openSourceImg(data.playlist, store.mainLang)"
+            @click.stop="openSourceImg(data.playlist, langStore.mainLang)"
             loading="lazy"
           />
         </div>
         <div class="detail-text">
           <h2 class="text-main" ref="titleRef">
             {{ computedTitle }} ({{ data.playlist.tracksnum }})<br />
-            <small
-              >{{ PlaylistType[data.playlist.type] }} ·
-              {{ data.playlist.tracksnum }} Tracks ·
-              {{ getTotalDuration(data.tracks) }}</small
-            >
+            <small>
+              {{ computedPlaylistTypeText }} · {{ getTotalDuration(data.tracks) }}
+            </small>
             <small class="text-desc">{{
               stringMap.getString(data.playlist, 'desc')
             }}</small>
@@ -35,8 +27,8 @@
           <h3 v-if="group.game">
             <router-link :to="`/game/${group.game.id}`">
               <img v-fallback :src="imgMap.getPath('game', group.game)" loading="lazy" />
-              {{ stringMap.getString(group.game, 'title') }}</router-link
-            >
+              {{ stringMap.getString(group.game, 'title') }}
+            </router-link>
           </h3>
           <TrackItem
             v-for="(track, index) in group.tracks"
@@ -52,36 +44,40 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, type ComputedRef } from 'vue';
+import { computed, h, onMounted, ref, type ComputedRef } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
-import { useStore } from '@/stores';
+import { useLangStore } from '@/stores';
+import { useHeader } from '@/composables/useHeader';
 import { useRequest } from '@/composables/useRequest';
 import { useImgMap } from '@/composables/useImgMap';
 import { useLocalizationString } from '@/composables/useLocalizationString';
-import {
-  PlaylistType,
-  type Game,
-  type PlaylistDetail,
-  type PlaylistTrack,
-} from '@/types';
-import Header from '@/components/Header.vue';
 import Container from '@/components/Container.vue';
 import TrackItem from '@/components/TrackItem.vue';
+import { type Game, type PlaylistDetail, type PlaylistTrack } from '@/types';
 import { openSourceImg, getTotalDuration } from '@/utils/data-utils';
 import { getPlaylistDetail } from '@/api';
 
-defineOptions({ name: 'Playlist' });
-
+const { t } = useI18n();
 const route = useRoute();
 const { loading, request } = useRequest();
 const imgMap = useImgMap();
 const stringMap = useLocalizationString();
 const pid = route.params.pid as string;
-const store = useStore();
+const langStore = useLangStore();
 const data = ref<PlaylistDetail>();
 const titleRef = ref<HTMLElement>();
 
 const computedTitle = computed(() => stringMap.getString(data.value!.playlist, 'title'));
+const computedPlaylistTypeText = computed(
+  () =>
+    data.value &&
+    t(`playlist.type.${data.value.playlist.type}`, {
+      gameTitle:
+        computedTrackGroup.value[0].game &&
+        stringMap.getString(computedTrackGroup.value[0].game, 'title'),
+    })
+);
 const computedTrackGroup: ComputedRef<{ game?: Game; tracks: PlaylistTrack[] }[]> =
   computed(() => {
     if (!data.value) {
@@ -104,6 +100,21 @@ const computedTrackGroup: ComputedRef<{ game?: Game; tracks: PlaylistTrack[] }[]
       return [{ tracks: data.value.tracks }];
     }
   });
+
+useHeader(() => ({
+  observeRef: titleRef.value,
+  data: data.value,
+  template: () => {
+    if (data.value) {
+      return h('span', [
+        computedTitle.value,
+        h('small', ` (${computedPlaylistTypeText.value})`),
+      ]);
+    } else {
+      return h('span');
+    }
+  },
+}));
 
 onMounted(async () => {
   await getDetail();

@@ -79,15 +79,10 @@ for (const lang of langs) {
     imgIds = errors[lang];
   }
 
-  const originalDir = path.join(FILES_DIR, 'img', `original_${lang}`);
-  const compressedDir = path.join(
-    ROOT_DIR,
-    '../frontend/public/assets/new',
-    `img_${lang}`
-  );
+  const originalDir = path.join(ROOT_DIR, '../assets/original_images', `${lang}`);
+  const compressedDir = path.join(ROOT_DIR, '../assets/new', `img_${lang}`);
   fs.mkdirSync(originalDir, { recursive: true });
   fs.mkdirSync(compressedDir, { recursive: true });
-  console.log(compressedDir);
 
   tasks.push({
     lang: lang,

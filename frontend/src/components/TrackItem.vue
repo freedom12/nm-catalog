@@ -4,7 +4,7 @@
       <img
         v-fallback
         :src="imgMap.getPath('track', data)"
-        @click.stop="openSourceImg(data, store.mainLang)"
+        @click.stop="openSourceImg(data, langStore.mainLang)"
         loading="lazy"
       />
     </div>
@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useStore } from '@/stores';
+import { useLangStore } from '@/stores';
 import { useImgMap } from '@/composables/useImgMap';
 import { useLocalizationString } from '@/composables/useLocalizationString';
 import SvgIcon from '@/components/SvgIcon.vue';
@@ -45,12 +45,12 @@ const props = defineProps<{
   hideTag?: boolean;
 }>();
 
-const store = useStore();
+const langStore = useLangStore();
 const imgMap = useImgMap();
 const stringMap = useLocalizationString();
 
 const computedLangs = computed(() =>
-  store.langList.filter((x) => isShowTitle(props.data, x))
+  langStore.langList.filter((x) => isShowTitle(props.data, x))
 );
 </script>
 

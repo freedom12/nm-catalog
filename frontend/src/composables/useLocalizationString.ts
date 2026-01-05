@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { useStore } from '@/stores';
+import { useLangStore } from '@/stores';
 import { type LangCodeValue, type NMData } from '@/types';
 import { LocalizationString } from '@/utils/localization-string';
 
@@ -21,7 +21,7 @@ const api = {
       return '';
     }
     const key = `${data.id}:${propName}`;
-    return stringMap.value.get(key)?.get(lang ?? useStore().mainLang) ?? '';
+    return stringMap.value.get(key)?.get(lang ?? useLangStore().mainLang) ?? '';
   },
 };
 

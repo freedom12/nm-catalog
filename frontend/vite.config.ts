@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons';
+import serveStatic from 'serve-static';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -17,6 +18,15 @@ export default defineConfig({
       inject: 'body-first',
       customDomId: '__svg__icons__dom__',
     }),
+    {
+      name: 'static-assets',
+      configureServer(server) {
+        server.middlewares.use(
+          '/assets',
+          serveStatic(path.resolve(__dirname, '../assets'))
+        );
+      },
+    },
   ],
   resolve: {
     alias: {
@@ -25,6 +35,9 @@ export default defineConfig({
     extensions: ['.ts', '.vue'],
   },
   server: {
+    fs: {
+      allow: [path.resolve(__dirname, '..')],
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:5002',
