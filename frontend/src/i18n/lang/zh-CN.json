@@ -40,5 +40,8 @@
   "info": {
     "lang": "首选语言",
     "top": "回到顶部"
+  },
+  "punctuation": {
+    "colon": "："
   }
 }

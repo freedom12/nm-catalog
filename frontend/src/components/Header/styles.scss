@@ -1,0 +1,176 @@
+@use '@/styles/variables.scss' as *;
+$headerHeight: 48px;
+
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+
+  &:last-of-type {
+    box-shadow: 0 0 1.5rem 1rem rgba($root-bgColor, 0.7);
+  }
+}
+
+#header {
+  z-index: 2;
+  height: $headerHeight;
+  padding: 0 1.5rem;
+  background-color: $header-bgColor;
+
+  color: $header-textColor;
+  opacity: 1;
+  // transition: all 0.3s ease;
+  font: bold 1rem 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  line-height: 2.3em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  .brand {
+    display: inline-flex;
+    background-color: $header-bgColor;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    font-size: 1.05rem;
+    cursor: pointer;
+
+    > img {
+      height: 32px;
+    }
+  }
+
+  button {
+    display: none;
+  }
+
+  nav {
+    margin-left: auto;
+    padding: 0 1rem;
+
+    > a {
+      display: inline-block;
+      height: $headerHeight;
+      border-bottom: 2px solid transparent;
+      padding: 0 0.75rem;
+      color: white;
+      opacity: 0.7;
+      transition: all 0.3s ease;
+      line-height: $headerHeight;
+      font-size: 0.9rem;
+
+      &.active {
+        border-color: rgba(white, 0.7);
+        opacity: 1;
+      }
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+#subHeader {
+  padding: 0 1em;
+  background-color: $header-bgColor-detail;
+  color: $header-textColor-detail;
+  font-weight: bold;
+  text-align: center;
+  line-height: 2rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &.active {
+    transform: translateY($headerHeight);
+  }
+
+  > .app-width {
+    display: block;
+  }
+}
+
+.app-width {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (prefers-color-scheme: light) {
+  header {
+    &:last-child {
+      box-shadow: 0 0 1.5rem 1rem rgba($root-bgColor-light, 0.7);
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  #header {
+    height: 36px;
+    padding: 0 1rem;
+    box-shadow: none;
+
+    .brand {
+      align-items: center;
+
+      > img {
+        height: 28px;
+      }
+    }
+
+    button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      width: $headerHeight * 0.75;
+      height: $headerHeight * 0.75;
+      border: none;
+      background-color: transparent;
+
+      &:hover {
+        + nav {
+          opacity: 0.85;
+          transform: translateX(0);
+        }
+      }
+    }
+
+    nav {
+      position: fixed;
+      top: $headerHeight * 0.75;
+      right: 0;
+      height: 100%;
+      padding: 1rem 0 0;
+      background-color: rgba($header-bgColor, 0.9);
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.3s ease;
+
+      > a {
+        display: block;
+        padding: 0 2rem;
+        text-align: left;
+
+        &.active {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+
+  #subHeader {
+    height: $headerHeight * 0.75;
+    opacity: 0;
+    line-height: $headerHeight * 0.75;
+
+    &.active {
+      z-index: 2;
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

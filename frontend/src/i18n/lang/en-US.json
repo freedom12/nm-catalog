@@ -40,5 +40,8 @@
   "info": {
     "lang": "Preferred Language",
     "top": "Top"
+  },
+  "punctuation": {
+    "colon": ":"
   }
 }

@@ -37,6 +37,7 @@
           margin-bottom: 8px;
           border-radius: 8px;
           cursor: pointer;
+          transition: all 0.3s ease;
         }
 
         > span {
@@ -49,6 +50,14 @@
           word-break: break-word;
           max-height: calc(1.1rem * 3 * 1.5);
           cursor: pointer;
+        }
+      }
+
+      &:hover {
+        > a {
+          > img {
+            transform: scale(105%);
+          }
         }
       }
     }
@@ -85,7 +94,6 @@
     position: absolute;
     right: 0;
     padding-right: $width * 1.2;
-    transition: all 0.3s ease;
 
     > ul {
       border-radius: 8px;
@@ -158,7 +166,7 @@
 @media (max-width: 767px) {
   #select {
     width: 100%;
-    padding-top: 3.5rem;
+    padding-top: 4rem;
     padding-bottom: 0.5rem;
     visibility: visible;
   }
