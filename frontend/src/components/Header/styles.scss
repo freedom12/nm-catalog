@@ -3,6 +3,7 @@ $headerHeight: 48px;
 header {
   position: fixed;
   top: 0;
+  left: 0;
   width: 100%;
   z-index: 1;
 
@@ -102,7 +103,7 @@ header {
 
 @media (max-width: 767px) {
   #header {
-    height: 36px;
+    height: $headerHeight * 0.75;
     padding: 0 1rem;
     box-shadow: none;
 
@@ -157,7 +158,7 @@ header {
   }
 
   #subHeader {
-    height: $headerHeight * 0.75;
+    height: $headerHeight * 0.75 + 1px;
     opacity: 0;
     line-height: $headerHeight * 0.75;
 

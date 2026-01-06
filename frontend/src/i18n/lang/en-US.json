@@ -32,7 +32,7 @@
       "SINGLE_GAME_ALL": "All Tracks from \"{gameTitle}\"",
       "BEST": "Top Tracks from \"{gameTitle}\"",
       "LOOP": "Extended Tracks from \"{gameTitle}\"",
-      "SINGLE_GAME": "Theme Playlist from \"{gameTitle}\"",
+      "SINGLE_GAME": "Theme Playlist of \"{gameTitle}\"",
       "MULTIPLE": "Multi-Game Related Playlist",
       "SPECIAL": "Special Playlist"
     }

@@ -1,6 +1,21 @@
 import { defineStore } from 'pinia';
-import { STORAGE_KEY, DEFAULT_LANG, type LangCodeValue } from '@/types';
+import { STORAGE_KEY, DEFAULT_LANG, type LangCodeValue, LangCode } from '@/types';
 import { i18n, loadLocaleMessage, SUPPORT_LOCALES, type LocaleType } from '@/i18n';
+
+export const getInitialLang = (): LangCodeValue => {
+  const LangCodes = Object.values(LangCode);
+  let navLang = navigator.language;
+  let matchLang = LangCodes.find((x) => x === navLang);
+  if (matchLang) {
+    return matchLang;
+  }
+  navLang = navLang.slice(0, 2);
+  if (navLang === 'zh') {
+    return LangCode.zh_CN;
+  }
+  matchLang = LangCodes.find((x) => x.slice(0, 2) === navLang);
+  return matchLang ?? DEFAULT_LANG;
+};
 
 export const getLocale = (locale?: LocaleType): LocaleType => {
   if (!locale) {
@@ -12,11 +27,7 @@ export const getLocale = (locale?: LocaleType): LocaleType => {
       if ((SUPPORT_LOCALES as unknown as string[]).includes(navLang)) {
         return navLang as LocaleType;
       } else {
-        if (navLang.includes('zh')) {
-          return 'zh-CN';
-        } else {
-          return DEFAULT_LANG;
-        }
+        return DEFAULT_LANG;
       }
     }
   } else {
@@ -27,7 +38,8 @@ export const getLocale = (locale?: LocaleType): LocaleType => {
 export const useLangStore = defineStore('lang', {
   state: () => ({
     locale: getLocale(),
-    mainLang: (localStorage.getItem(STORAGE_KEY.LANG) || DEFAULT_LANG) as LangCodeValue,
+    mainLang: (localStorage.getItem(STORAGE_KEY.LANG) ||
+      getInitialLang()) as LangCodeValue,
     langList: [] as LangCodeValue[],
   }),
   actions: {
