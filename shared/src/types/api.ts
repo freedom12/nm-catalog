@@ -17,8 +17,12 @@ export interface PlaylistTrack extends Track {
   game?: Game;
 }
 
+export interface PlaylistTrackGroup {
+  game?: Game;
+  tracks: PlaylistTrack[];
+}
+
 export interface PlaylistDetail {
   playlist: Playlist;
-  games?: Game[];
-  tracks: PlaylistTrack[];
+  trackGroups: PlaylistTrackGroup[];
 }

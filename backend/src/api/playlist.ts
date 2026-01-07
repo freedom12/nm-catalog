@@ -1,5 +1,11 @@
 import express, { type Request, type Response } from 'express';
-import { Game, Playlist, PlaylistDetail, PlaylistTrack } from '@nm-catalog/shared';
+import {
+  Game,
+  Playlist,
+  PlaylistDetail,
+  PlaylistTrack,
+  PlaylistTrackGroup,
+} from '@nm-catalog/shared';
 import { stmt } from '../db/statements.js';
 import { toError } from '../utils/tools.js';
 
@@ -9,13 +15,12 @@ router.get('/:id/detail', (req: Request, res: Response) => {
   const id = req.params.id;
   try {
     const playlist = stmt.playlist.selectById().all(id)[0] as Playlist;
-    const games: Game[] = [];
     const tracks: PlaylistTrack[] = [];
+    const trackGroups: PlaylistTrackGroup[] = [];
 
     if (['SINGLE_GAME_ALL', 'BEST', 'LOOP'].includes(playlist.type)) {
-      games.push(...(stmt.playlist_game.selectGameByPid().all(id) as Game[]));
-
-      const allTracks = stmt.track.selectByGid().all(games[0].id) as PlaylistTrack[];
+      const game = <Game>stmt.playlist_game.selectGameByPid().all(id)[0];
+      const allTracks = stmt.track.selectByGid().all(game.id) as PlaylistTrack[];
       tracks.push(
         ...allTracks.filter((x) => {
           switch (playlist.type) {
@@ -28,12 +33,9 @@ router.get('/:id/detail', (req: Request, res: Response) => {
           }
         })
       );
+      trackGroups.push({ game, tracks });
     } else {
       if (playlist.tracksnum) {
-        if (playlist.isrelatedgame) {
-          games.push(...(stmt.playlist_game.selectGameByPid().all(id) as Game[]));
-        }
-
         const ptIds = (
           stmt.playlist_track.selectTrackByPid().all(id) as PlaylistTrack[]
         ).map((x) => x.id);
@@ -41,11 +43,29 @@ router.get('/:id/detail', (req: Request, res: Response) => {
           (a, b) => ptIds.indexOf(a.id) - ptIds.indexOf(b.id)
         );
         tracks.push(...pTracks);
+
+        if (playlist.isrelatedgame) {
+          const games = stmt.playlist_game.selectGameByPid().all(id) as Game[];
+          tracks.forEach((x, i) => {
+            if (i === 0 || x.gid !== tracks[i - 1].gid) {
+              trackGroups.push({
+                game: games.find((y) => y.id === x.gid),
+                tracks: [],
+              });
+            }
+            const group = trackGroups.at(-1);
+            group!.tracks.push(x);
+          });
+        } else {
+          trackGroups.push({ tracks });
+        }
       } else {
         // const sUtc9 = now.toLocaleString('en-US', {
         //   timeZone: 'Asia/Tokyo',
         // });
         // # daily order (response/playlist_(pid).json)
+
+        trackGroups.push({ tracks: [] });
       }
     }
 
@@ -53,11 +73,7 @@ router.get('/:id/detail', (req: Request, res: Response) => {
       x.pidx = i + 1;
     });
 
-    const result: PlaylistDetail = {
-      playlist: playlist,
-      games: games,
-      tracks: tracks,
-    };
+    const result: PlaylistDetail = { playlist, trackGroups };
     res.json(result);
   } catch (error) {
     const err = toError(error);

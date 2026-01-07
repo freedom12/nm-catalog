@@ -1,0 +1,50 @@
+{
+  "hello": "你好",
+  "common": {
+    "game": "遊戲",
+    "playlist": "播放清單",
+    "hour": "小時",
+    "minute": "分"
+  },
+  "game": {
+    "groupBy": {
+      "PLATFORM": "依硬體分組",
+      "RELEASE": "依發售年份分組",
+      "ADDED": "依加入順序排序"
+    },
+    "dataSection": {
+      "TRACK": "{count} 首樂曲",
+      "PLAYLIST": "{count} 個相關播放清單",
+      "RELATED": "{count} 個相關遊戲"
+    },
+    "playlist": {
+      "SINGLE_GAME": "主題播放清單",
+      "MULTIPLE": "相關播放清單"
+    }
+  },
+  "track": {
+    "tag": {
+      "ALL": "所有",
+      "TOP": "推薦",
+      "LOOP": "可更改長度"
+    }
+  },
+  "playlist": {
+    "trackCount": "{count}首",
+    "type": {
+      "SINGLE_GAME_ALL": "《{gameTitle}》所有樂曲",
+      "BEST": "《{gameTitle}》推薦樂曲",
+      "LOOP": "《{gameTitle}》更改長度對應樂曲",
+      "SINGLE_GAME": "《{gameTitle}》主題播放清單",
+      "MULTIPLE": "多遊戲播放清單",
+      "SPECIAL": "特別發布"
+    }
+  },
+  "info": {
+    "lang": "首選語言",
+    "top": "回到頂部"
+  },
+  "punctuation": {
+    "colon": "："
+  }
+}

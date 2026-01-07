@@ -4,7 +4,7 @@ import type { VNode } from 'vue';
 export interface HeaderConfig {
   observeRef?: HTMLElement;
   data?: Record<string, any>;
-  template?: VNode | (() => VNode);
+  template?: VNode[] | (() => VNode[]);
 }
 
 export const useHeaderStore = defineStore('header', {

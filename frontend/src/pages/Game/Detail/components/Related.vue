@@ -11,12 +11,12 @@
           />
         </div>
         <div class="detail-text">
-          <h4 class="text-main">
+          <h3 class="text-main">
             <router-link :to="`/game/${relate.id}`">
               {{ stringMap.getString(relate, 'title') }}</router-link
             >
             <span>{{ relate.year }} | {{ relate.hardware }}</span>
-          </h4>
+          </h3>
         </div>
       </li>
     </ol>
@@ -41,7 +41,7 @@ const stringMap = useLocalizationString();
 </script>
 
 <style lang="scss" scoped>
-h4 {
+h3 {
   > span {
     display: block;
     margin-top: 0.8em;
@@ -56,7 +56,7 @@ h4 {
 }
 
 @media (max-width: 767px) {
-  h4 {
+  h3 {
     > span {
       font-size: smaller;
     }

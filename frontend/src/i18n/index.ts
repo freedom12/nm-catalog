@@ -1,14 +1,13 @@
 import { DEFAULT_LANG } from '@/types';
 import { createI18n } from 'vue-i18n';
 
-export const SUPPORT_LOCALES = ['zh-CN', 'en-US'] as const;
+export const SUPPORT_LOCALES = ['en-US', 'zh-CN', 'zh-TW'] as const;
 export type LocaleType = (typeof SUPPORT_LOCALES)[number];
 
 const loaded: LocaleType[] = [];
-const loaders = {
-  'zh-CN': () => import('./lang/zh-CN.json'),
-  'en-US': () => import('./lang/en-US.json'),
-};
+const loaders = Object.fromEntries(
+  SUPPORT_LOCALES.map((lang) => [lang, () => import(`./lang/${lang}.json`)])
+);
 
 export const loadLocaleMessage = async (locale: LocaleType) => {
   if (loaded.includes(locale)) {

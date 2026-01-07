@@ -9,7 +9,7 @@
       />
     </div>
     <div class="detail-text">
-      <h4 class="prefix-text text-main">
+      <h3 class="prefix-text text-main">
         {{ idx ?? data.idx }}.&nbsp;
         <span>
           {{ stringMap.getString(data, 'title') }}
@@ -19,7 +19,7 @@
           <SvgIcon type="star" :class="{ active: data.isbest }"></SvgIcon>
           <SvgIcon type="repeat" :class="{ active: data.isloop }"></SvgIcon>
         </div>
-      </h4>
+      </h3>
       <ul class="text-else">
         <li v-for="lang of computedLangs" :key="lang" class="prefix-text">
           <b>{{ lang }}</b> {{ stringMap.getString(data, 'title', lang) }}
@@ -55,7 +55,6 @@ const computedLangs = computed(() =>
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables.scss' as *;
 .tag {
   position: absolute;
   top: 0.45em;

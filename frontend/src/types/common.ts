@@ -8,3 +8,9 @@ export const STORAGE_KEY = {
   LANG: 'LANG',
   GAME_GROUPBY: 'GAME_GROUPBY',
 };
+
+export interface DurationInfo {
+  hour: number;
+  minute: number;
+  second: number;
+}

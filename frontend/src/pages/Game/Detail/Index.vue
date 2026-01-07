@@ -11,10 +11,10 @@
           />
         </div>
         <div class="detail-text">
-          <h2 class="text-main" ref="titleRef">
+          <h1 class="text-main" ref="titleRef">
             {{ computedTitle }}<br />
             <small>{{ data.game.year }} | {{ data.game.hardware }}</small>
-          </h2>
+          </h1>
           <ul class="text-else">
             <li v-for="lang of computedLangs" :key="lang" class="prefix-text">
               <b>{{ lang }}</b>
@@ -24,7 +24,7 @@
         </div>
       </section>
       <nav class="tabs">
-        <div
+        <button
           v-for="item in computedSections"
           :key="item.key"
           class="tab"
@@ -35,7 +35,7 @@
           @click.stop="gameDataSection = item.key"
         >
           {{ item.label }}
-        </div>
+        </button>
       </nav>
       <section class="detail">
         <Track
@@ -104,12 +104,12 @@ useHeader(() => ({
   data: data.value,
   template: () => {
     if (data.value) {
-      return h('span', [
-        computedTitle.value,
-        h('small', ` (${data.value.game.year}) | ${data.value.game.hardware}`),
-      ]);
+      return [
+        h('h1', computedTitle.value),
+        h('small', `(${data.value.game.year}) | ${data.value.game.hardware})`),
+      ];
     } else {
-      return h('span');
+      return [];
     }
   },
 }));

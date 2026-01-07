@@ -1,5 +1,5 @@
 import { useLangStore } from '@/stores';
-import { DEFAULT_LANG, type NMData, type Track } from '@/types';
+import { DEFAULT_LANG, type DurationInfo, type NMData, type Track } from '@/types';
 import { LocalizationString } from './localization-string';
 
 export const isShowTitle = (target: NMData, lang: string): boolean => {
@@ -23,9 +23,9 @@ export const openSourceImg = (target: NMData, lang: string) => {
   );
 };
 
-export const getTotalDuration = (tracks: Track[]): string => {
+export const getTotalDuration = (tracks: Track[]): DurationInfo => {
   if (tracks.length === 0) {
-    return '0:00';
+    return { hour: 0, minute: 0, second: 0 };
   }
   let totalSeconds = 0;
   for (const track of tracks) {
@@ -36,14 +36,8 @@ export const getTotalDuration = (tracks: Track[]): string => {
       totalSeconds += parts[0] * 3600 + parts[1] * 60 + parts[2];
     }
   }
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-  if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds
-      .toString()
-      .padStart(2, '0')}`;
-  } else {
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  }
+  const hour = Math.floor(totalSeconds / 3600);
+  const minute = Math.floor((totalSeconds % 3600) / 60);
+  const second = totalSeconds % 60;
+  return { hour, minute, second };
 };

@@ -1,7 +1,7 @@
 <template>
   <section :hidden="hidden">
     <template v-for="group in computedPlaylistGroups" :key="group.label">
-      <h3>{{ group.label }}</h3>
+      <h2>{{ group.label }}</h2>
       <ul>
         <li v-for="playlist in group.playlists" :key="playlist.id">
           <PlaylistCard :playlist="playlist" />
@@ -21,36 +21,37 @@ const props = defineProps<{
   hidden: boolean;
   data: Playlist[];
 }>();
+const playlistGroups = (() => {
+  const groupMap = new Map<string, Playlist[]>();
+  props.data.forEach((x) => {
+    const type = ['SINGLE_GAME', 'MULTIPLE'].includes(x.type) ? x.type : '';
+    if (!groupMap.has(type)) {
+      groupMap.set(type, []);
+    }
+    groupMap.get(type)!.push(x);
+  });
+  return Array.from(groupMap.entries());
+})();
 
 const { t } = useI18n();
 
 const computedPlaylistGroups = computed(() => {
-  const groupMap = new Map<string, Playlist[]>();
-  props.data.forEach((x) => {
-    const label = t(`game.playlist.${x.type}`, {}, { default: '' });
-    if (!groupMap.has(label)) {
-      groupMap.set(label, []);
-    }
-    groupMap.get(label)!.push(x);
-  });
-
-  return Array.from(groupMap.entries()).map(([label, playlists]) => ({
-    label,
+  return playlistGroups.map(([type, playlists]) => ({
+    label: t(`game.playlist.${type}`, { count: playlists.length }, { default: '' }),
     playlists,
   }));
 });
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables.scss' as *;
-
-h3 {
+h2 {
   width: 60%;
   margin-top: 2rem;
   border-bottom: 1px solid $root-bgColor-light;
   padding-bottom: 0.5em;
   opacity: 0.4;
   text-align: left;
+  font-size: 1.2rem;
 
   &:empty {
     margin: 0;
@@ -70,12 +71,16 @@ ul {
 }
 
 @media (prefers-color-scheme: light) {
-  h3 {
+  h2 {
     border-color: $root-textColor-light;
   }
 }
 
 @media (max-width: 767px) {
+  h2 {
+    font-size: 1rem;
+  }
+
   ul {
     display: block;
     text-align: left;

@@ -1,5 +1,3 @@
-@use '@/styles/variables.scss' as *;
-
 #main {
   max-width: 992px;
   margin: 4rem auto 3rem;
@@ -9,8 +7,7 @@
 
   > .common-detail {
     min-height: 200px;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
+    margin-bottom: 2rem;
 
     > div {
       &.detail-image {
@@ -28,14 +25,18 @@
 
   .tabs {
     display: flex;
-    margin-bottom: 0.5rem;
+    margin: 0.5rem 0;
     border-bottom: 1px solid rgba(128, 128, 128, 0.5);
 
     .tab {
       flex: 1;
+      background: none;
+      border: none;
       border-bottom: 1px solid rgba(128, 128, 128, 0.5);
       padding: 10px 20px;
       opacity: 0.3;
+      font-size: 1rem;
+      white-space: nowrap;
       cursor: pointer;
 
       &.active {
@@ -62,7 +63,7 @@
 
 @media (max-width: 767px) {
   #main {
-    margin-top: 2rem;
+    margin-top: 2.5rem;
     margin-bottom: 0;
     padding: 1rem;
     box-shadow: none !important;

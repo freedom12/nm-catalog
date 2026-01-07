@@ -1,3 +1,6 @@
+@use '@/styles/variables.scss' as *;
+@use '@/styles/mixins.scss' as *;
+
 .radio-group {
   label {
     display: inline-flex;
@@ -12,7 +15,7 @@
         display: inline-block;
         opacity: 0.5;
         font-weight: bolder;
-        font-size: 0.8em;
+        font-size: 0.9em;
         text-indent: 0.5em;
       }
 
@@ -63,16 +66,24 @@
       flex: 1;
       padding-left: 1rem;
 
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      h3 {
+        font-size: 1rem;
+        padding-right: 3em;
+      }
+
       .text-main {
         position: relative;
         margin: 0 0 0.5rem;
-        padding-right: 3em;
 
         small {
           display: inline-block;
-          margin-top: .5em;
+          margin-top: 0.5em;
           opacity: 0.4;
-          font-size: 0.8em;
+          font-size: 0.7em;
         }
       }
 
@@ -102,12 +113,20 @@
 
 @media (max-width: 767px) {
   .common-detail {
-    > div:first-child {
-      display: none !important;
-    }
+    > div {
+      &.detail-image {
+        display: none !important;
+      }
 
-    .detail-main {
-      font-size: 0.8rem;
+      &.detail-text {
+        h1 {
+          font-size: 1.2rem;
+        }
+
+        h3 {
+          font-size: 0.8rem;
+        }
+      }
     }
 
     ul {

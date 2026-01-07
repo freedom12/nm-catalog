@@ -2,7 +2,7 @@
   <div id="top-mark" ref="topRef"></div>
   <footer id="footer">
     <label>
-      {{ t('info.lang') }}:
+      {{ t('info.lang') }}{{ t('punctuation.colon') }}
       <select name="lang" v-model="mainLang" @change="onLangChange">
         <option v-for="lang in langList" :key="lang" :value="lang">
           {{ lang }}
@@ -52,8 +52,6 @@ function scrollToTop() {
 </script>
 
 <style lang="scss" scoped>
-@use '@/styles/variables.scss' as *;
-
 #top-mark {
   position: absolute;
   top: 0;

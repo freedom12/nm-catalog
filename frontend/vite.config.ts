@@ -10,6 +10,16 @@ export default defineConfig({
   build: {
     target: 'es2015',
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `
+        @use "@/styles/variables.scss" as *;
+        @use "@/styles/mixins.scss" as *;
+      `,
+      },
+    },
+  },
   plugins: [
     vue(),
     createSvgIconsPlugin({

@@ -1,5 +1,3 @@
-@use '@/styles/variables.scss' as *;
-
 #main {
   max-width: 992px;
   margin: 4rem auto 3rem;
@@ -44,7 +42,10 @@
     border-top: 1px solid rgba(128, 128, 128, 0.5);
     padding-top: 0.8rem;
 
-    > h3 {
+    > h2 {
+      font-size: 1.1rem;
+      text-align: left;
+
       > a {
         display: flex;
         align-items: center;
@@ -72,7 +73,7 @@
 
 @media (max-width: 767px) {
   #main {
-    margin-top: 2rem;
+    margin-top: 2.5rem;
     margin-bottom: 0;
     padding: 1rem;
     box-shadow: none !important;
@@ -98,10 +99,16 @@
 
           > .text-main {
             > .text-desc {
-              font-size: 0.8em;
+              font-size: 0.7em;
             }
           }
         }
+      }
+    }
+
+    .detail {
+      > h2 {
+        font-size: 1rem;
       }
     }
   }

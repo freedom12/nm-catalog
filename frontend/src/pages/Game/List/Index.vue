@@ -27,7 +27,7 @@
         }
       "
       >
-        <h3>{{ group.name }}</h3>
+        <h1>{{ group.name }}</h1>
         <ul class="game">
           <li class="card" v-for="game in group.games" :key="game.id">
             <router-link :to="`/game/${game.id}`" :title="game.$title">

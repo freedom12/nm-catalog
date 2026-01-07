@@ -11,25 +11,28 @@
           />
         </div>
         <div class="detail-text">
-          <h2 class="text-main" ref="titleRef">
-            {{ computedTitle }} ({{ data.playlist.tracksnum }})<br />
-            <small>
-              {{ computedPlaylistTypeText }} · {{ getTotalDuration(data.tracks) }}
+          <h1 class="text-main" ref="titleRef">
+            {{ computedTitle }}<br />
+            <small> {{ computedPlaylistTypeText }}</small>
+            <small class="text-desc">
+              {{ t('playlist.trackCount', { count: data.playlist.tracksnum }) }} ·
+              <template v-if="data.duration.hour">{{ data.duration.hour }}{{ t('common.hour') }}</template>
+              {{ data.duration.minute }}{{ t('common.minute') }}
             </small>
             <small class="text-desc">{{
               stringMap.getString(data.playlist, 'desc')
             }}</small>
-          </h2>
+          </h1>
         </div>
       </section>
       <section class="detail">
-        <template v-for="group in computedTrackGroup">
-          <h3 v-if="group.game">
+        <template v-for="group in data.trackGroups">
+          <h2 v-if="group.game">
             <router-link :to="`/game/${group.game.id}`">
               <img v-fallback :src="imgMap.getPath('game', group.game)" loading="lazy" />
               {{ stringMap.getString(group.game, 'title') }}
             </router-link>
-          </h3>
+          </h2>
           <TrackItem
             v-for="(track, index) in group.tracks"
             :key="track.id"
@@ -44,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, onMounted, ref, type ComputedRef } from 'vue';
+import { computed, h, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { useLangStore } from '@/stores';
@@ -54,7 +57,7 @@ import { useImgMap } from '@/composables/useImgMap';
 import { useLocalizationString } from '@/composables/useLocalizationString';
 import Container from '@/components/Container.vue';
 import TrackItem from '@/components/TrackItem.vue';
-import { type Game, type PlaylistDetail, type PlaylistTrack } from '@/types';
+import { type DurationInfo, type PlaylistDetail } from '@/types';
 import { openSourceImg, getTotalDuration } from '@/utils/data-utils';
 import { getPlaylistDetail } from '@/api';
 
@@ -65,7 +68,7 @@ const imgMap = useImgMap();
 const stringMap = useLocalizationString();
 const pid = route.params.pid as string;
 const langStore = useLangStore();
-const data = ref<PlaylistDetail>();
+const data = ref<PlaylistDetail & { duration: DurationInfo }>();
 const titleRef = ref<HTMLElement>();
 
 const computedTitle = computed(() => stringMap.getString(data.value!.playlist, 'title'));
@@ -74,44 +77,22 @@ const computedPlaylistTypeText = computed(
     data.value &&
     t(`playlist.type.${data.value.playlist.type}`, {
       gameTitle:
-        computedTrackGroup.value[0].game &&
-        stringMap.getString(computedTrackGroup.value[0].game, 'title'),
+        data.value.trackGroups[0].game &&
+        stringMap.getString(data.value.trackGroups[0].game, 'title'),
     })
 );
-const computedTrackGroup: ComputedRef<{ game?: Game; tracks: PlaylistTrack[] }[]> =
-  computed(() => {
-    if (!data.value) {
-      return [];
-    }
-    if (data.value.playlist.isrelatedgame) {
-      const gameSeq =
-        data.value.playlist.type !== 'MULTIPLE'
-          ? [data.value.games![0].id]
-          : [...new Set(data.value.tracks.map((x) => x.gid))];
-      return data.value
-        .games!.sort((a, b) => gameSeq.indexOf(a.id) - gameSeq.indexOf(b.id))
-        .map((x) => ({
-          game: x,
-          tracks: data.value!.tracks.filter((y) => {
-            return y.gid === x.id;
-          }),
-        }));
-    } else {
-      return [{ tracks: data.value.tracks }];
-    }
-  });
 
 useHeader(() => ({
   observeRef: titleRef.value,
   data: data.value,
   template: () => {
     if (data.value) {
-      return h('span', [
-        computedTitle.value,
+      return [
+        h('h1', computedTitle.value),
         h('small', ` (${computedPlaylistTypeText.value})`),
-      ]);
+      ];
     } else {
-      return h('span');
+      return [];
     }
   },
 }));
@@ -122,14 +103,16 @@ onMounted(async () => {
 
 async function getDetail() {
   const result = await request(getPlaylistDetail(pid));
+  const games = result.trackGroups.filter((x) => x.game).map((x) => x.game!);
+  const tracks = result.trackGroups.map((x) => x.tracks).flat(1);
   imgMap
     .setData('playlist', [result.playlist])
-    .setData('game', result.games ?? [])
-    .setData('track', result.tracks);
+    .setData('game', games)
+    .setData('track', tracks);
   stringMap
-    .setData([result.playlist, ...(result.games ?? []), ...result.tracks], 'title')
+    .setData([result.playlist, ...games, ...tracks], 'title')
     .setData([result.playlist], 'desc');
-  data.value = result;
+  data.value = Object.assign(result, { duration: getTotalDuration(tracks) });
 }
 </script>
 

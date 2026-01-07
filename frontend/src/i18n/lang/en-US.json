@@ -2,7 +2,9 @@
   "hello": "Hello",
   "common": {
     "game": "Game",
-    "playlist": "Playlist"
+    "playlist": "Playlist",
+    "hour": "h",
+    "minute": "m"
   },
   "game": {
     "groupBy": {
@@ -28,11 +30,12 @@
     }
   },
   "playlist": {
+    "trackCount": "{count} track | {count} tracks",
     "type": {
       "SINGLE_GAME_ALL": "All Tracks from \"{gameTitle}\"",
       "BEST": "Top Tracks from \"{gameTitle}\"",
       "LOOP": "Extended Tracks from \"{gameTitle}\"",
-      "SINGLE_GAME": "Theme Playlist from \"{gameTitle}\"",
+      "SINGLE_GAME": "Theme Playlist of \"{gameTitle}\"",
       "MULTIPLE": "Multi-Game Related Playlist",
       "SPECIAL": "Special Playlist"
     }
@@ -40,5 +43,8 @@
   "info": {
     "lang": "Preferred Language",
     "top": "Top"
+  },
+  "punctuation": {
+    "colon": ":"
   }
 }

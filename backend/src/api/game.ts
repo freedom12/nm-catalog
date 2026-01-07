@@ -234,13 +234,7 @@ router.get('/:id/detail', async (req: Request, res: Response) => {
     ];
 
     const [game, tracks, playlists, relateds] = await Promise.all(promises);
-
-    const result = {
-      game: game,
-      tracks: tracks,
-      playlists: playlists,
-      relateds: relateds,
-    };
+    const result = { game, tracks, playlists, relateds };
     res.json(result);
   } catch (error) {
     const err = toError(error);

@@ -2,12 +2,14 @@
   "hello": "你好",
   "common": {
     "game": "游戏",
-    "playlist": "播放列表"
+    "playlist": "播放列表",
+    "hour": "小时",
+    "minute": "分钟"
   },
   "game": {
     "groupBy": {
       "PLATFORM": "按平台分组",
-      "RELEASE": "按发行年份分组",
+      "RELEASE": "按发售年份分组",
       "ADDED": "按最新添加排序"
     },
     "dataSection": {
@@ -17,7 +19,7 @@
     },
     "playlist": {
       "SINGLE_GAME": "主题播放列表",
-      "MULTIPLE": "关联播放列表"
+      "MULTIPLE": "相关播放列表"
     }
   },
   "track": {
@@ -28,10 +30,11 @@
     }
   },
   "playlist": {
+    "trackCount": "{count}首",
     "type": {
       "SINGLE_GAME_ALL": "《{gameTitle}》所有乐曲",
       "BEST": "《{gameTitle}》精选乐曲",
-      "LOOP": "《{gameTitle}》中可更改时长的乐曲",
+      "LOOP": "《{gameTitle}》支持更改时长的乐曲",
       "SINGLE_GAME": "《{gameTitle}》主题播放列表",
       "MULTIPLE": "多游戏播放列表",
       "SPECIAL": "特别发布"
@@ -40,5 +43,8 @@
   "info": {
     "lang": "首选语言",
     "top": "回到顶部"
+  },
+  "punctuation": {
+    "colon": "："
   }
 }
