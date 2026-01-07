@@ -85,6 +85,7 @@ async function navigateTo(idx: number) {
   }
   emit('update:title', props.options[idx]);
   tracker.disconnect();
+
   const el = props.target[idx];
   scrollToY(el.getBoundingClientRect().top + window.scrollY - 80, () => {
     scrollHandler = () => {

@@ -1,11 +1,4 @@
 import fs from 'fs';
-import axios from 'axios';
-
-export const request = async (url: string): Promise<any> => {
-  console.log(`Fetch: ${url}`);
-  const res = await axios.get(url);
-  return res.data;
-};
 
 export const readText = (fileName: string): string => {
   if (fs.existsSync(fileName)) {

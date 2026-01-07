@@ -5,19 +5,13 @@
   -- (gid | pid)   # update playlists of specific games or playlists (with "-- section")
 */
 
-import { LangCode, LangCodeValue, PlaylistType } from '@nm-catalog/shared';
+import { LangCode, PlaylistType } from '@nm-catalog/shared';
 import { stmt } from '../db/statements.js';
 import { getTransactionByStatement } from '../db/transaction.js';
 import { COMMON_PATHS } from '../utils/paths.js';
-import {
-  getDuration,
-  info,
-  isUuid,
-  readText,
-  request,
-  writeText,
-} from '../utils/tools.js';
+import { getDuration, info, isUuid, readText, writeText } from '../utils/tools.js';
 import { DataCell, DataRow } from '../db/schema/index.js';
+import upstreem from '../utils/upstreem.js';
 
 const args = process.argv.slice(2);
 const specificIds = args.filter((x) => isUuid(x));
@@ -67,7 +61,7 @@ let hasError = false;
         const playlistTrackData: DataCell[][] = [];
 
         for (const lang of langs) {
-          rawPlaylistData = await getGamePlayListInfo(<string>gameId, lang);
+          rawPlaylistData = await upstreem.getPlaylistInfoOfGame(<string>gameId, lang);
           const playlistData: DataCell[][] = [
             rawPlaylistData.allPlaylist,
             rawPlaylistData.bestPlaylist,
@@ -95,7 +89,7 @@ let hasError = false;
             playlist.type !== <PlaylistType>'LOOP' &&
             !updateds.playlistIds.includes(playlist.id)
           ) {
-            const rawData = await getPlaylistTrack(playlist.id, langs[0]);
+            const rawData = await upstreem.getPlaylistInfo(playlist.id, langs[0]);
             const data: DataCell[][] = rawData.tracks.map((x: DataRow, i: number) => [
               playlist.id,
               i + 1,
@@ -148,7 +142,10 @@ let hasError = false;
           const trackData: DataCell[][] = [];
           const playlistTrackData: DataCell[][] = [];
 
-          const rawData: DataRow = await getPlaylistTrack(<string>playlist.id, lang);
+          const rawData: DataRow = await upstreem.getPlaylistInfo(
+            <string>playlist.id,
+            lang
+          );
           playlistData.push([
             rawData.id,
             rawData.type,
@@ -215,15 +212,3 @@ let hasError = false;
     }
   }
 })();
-
-async function getGamePlayListInfo(gameId: string, lang: LangCodeValue) {
-  return await request(
-    `https://api.m.nintendo.com/catalog/games/${gameId}/relatedPlaylists?country=JP&lang=${lang}`
-  );
-}
-
-async function getPlaylistTrack(playlistId: string, lang: LangCodeValue) {
-  return await request(
-    `https://api.m.nintendo.com/catalog/officialPlaylists/${playlistId}?country=JP&lang=${lang}`
-  );
-}

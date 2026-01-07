@@ -8,14 +8,14 @@
 
 import fs from 'fs';
 import path from 'path';
-import axios from 'axios';
 import sharp from 'sharp';
 import pLimit from 'p-limit';
 import { DEFAULT_LANG, LangCode, LangCodeValue } from '@nm-catalog/shared';
 import { stmt } from '../db/statements.js';
-import { COMMON_PATHS, FILES_DIR, ROOT_DIR } from '../utils/paths.js';
+import { COMMON_PATHS, ROOT_DIR } from '../utils/paths.js';
 import { info, readText, toError, writeText } from '../utils/tools.js';
 import { DataRow } from '../db/schema/index.js';
+import { UPSTREAM_IMG_BASE_URL } from '../utils/upstreem.js';
 
 type Task = {
   lang: LangCodeValue;
@@ -93,14 +93,17 @@ for (const lang of langs) {
   });
 }
 
-const host = 'https://image-assets.m.nintendo.com';
 const sum = tasks.map((x) => x.imgIds.length).reduce((a, b) => a + b, 0);
 info(`To download ${sum} image(s).`);
 
 const processImage = async (imgId: string, index: number, task: Task) => {
   try {
-    const res = await axios.get(`${host}/${imgId}`, { responseType: 'arraybuffer' });
-    const buffer = Buffer.from(res.data);
+    const res = await fetch(`${UPSTREAM_IMG_BASE_URL}${imgId}`);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    }
+    const arrayBuffer = await res.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
     const ext = '.jpg';
     const filename = `${imgId}${ext}`;
     const compressedPath = path.join(task.compressedDir, filename);
