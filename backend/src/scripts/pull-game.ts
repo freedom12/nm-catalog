@@ -11,8 +11,9 @@ import { LangCode, LangCodeValue } from '@nm-catalog/shared';
 import { stmt } from '../db/statements.js';
 import { getTransactionByStatement } from '../db/transaction.js';
 import { DataCell, DataRow } from '../db/schema/index.js';
-import { getDuration, info, isUuid, request, writeText } from '../utils/tools.js';
+import { getDuration, info, isUuid, writeText } from '../utils/tools.js';
 import { COMMON_PATHS } from '../utils/paths.js';
+import upstreem from '../utils/upstreem.js';
 
 const args = process.argv.slice(2);
 const isUpdateSpecific = args.filter((x) => isUuid(x)).length > 0;
@@ -29,7 +30,7 @@ const existedGameIds: string[] = stmt.game
 (async () => {
   try {
     let flatGameWithYears: DataRow[];
-    const gameWithYears: DataRow[][] = (await getGamesByYear(langs[0])).releasedAt
+    const gameWithYears: DataRow[][] = (await upstreem.getGamesByYear(langs[0]))
       .map((x: { releasedYear: number; items: DataRow[] }) => {
         x.items.forEach((y) => {
           y.releasedYear = x.releasedYear;
@@ -59,7 +60,7 @@ const existedGameIds: string[] = stmt.game
       await Promise.all(
         langs.map((x) =>
           limit(async () => {
-            const games: DataRow[] = await getGamesByAdded(x);
+            const games: DataRow[] = await upstreem.getGamesByRecent(x);
             return {
               [x]: games
                 .reverse()
@@ -94,7 +95,9 @@ const existedGameIds: string[] = stmt.game
       playlistInfos = (
         await Promise.all(
           games.map((x) =>
-            !x.isGameLink ? getGamePlaylistInfo(<string>x.id) : Promise.resolve(undefined)
+            !x.isGameLink
+              ? upstreem.getPlaylistInfoOfGame(<string>x.id)
+              : Promise.resolve(undefined)
           )
         )
       ).map((x) =>
@@ -133,7 +136,7 @@ const existedGameIds: string[] = stmt.game
           const game = games[i];
           if (!game.isGameLink) {
             const tracks: DataCell[][] = (
-              await getTracksByGame(
+              await upstreem.getPlaylistInfo(
                 <string>playlistInfos[i].allPlaylistId,
                 <LangCodeValue>lang
               )
@@ -160,7 +163,7 @@ const existedGameIds: string[] = stmt.game
 
     const relateDataSet = new Set<string>();
     for (const game of flatGameWithYears) {
-      const relatedGames: DataRow[] = await getRelateByGame(<string>game.id);
+      const relatedGames: DataRow[] = await upstreem.getRelatedsOfGame(<string>game.id);
       relatedGames.forEach((x) => {
         relateDataSet.add(`${game.id}+${x.id}`).add(`${x.id}+${game.id}`);
       });
@@ -185,33 +188,3 @@ const existedGameIds: string[] = stmt.game
     process.exit(1);
   }
 })();
-
-async function getGamesByAdded(lang: LangCodeValue): Promise<any> {
-  return await request(
-    `https://api.m.nintendo.com/catalog/games:all?country=JP&lang=${lang}&sortRule=RECENT`
-  );
-}
-
-async function getGamesByYear(lang: LangCodeValue): Promise<any> {
-  return await request(
-    `https://api.m.nintendo.com/catalog/gameGroups?country=JP&groupingPolicy=RELEASEDAT&lang=${lang}`
-  );
-}
-
-async function getGamePlaylistInfo(gameId: string): Promise<any> {
-  return await request(
-    `https://api.m.nintendo.com/catalog/games/${gameId}/relatedPlaylists?country=JP&lang=zh-CN`
-  );
-}
-
-async function getTracksByGame(playlistId: string, lang: LangCodeValue): Promise<any> {
-  return await request(
-    `https://api.m.nintendo.com/catalog/officialPlaylists/${playlistId}?country=JP&lang=${lang}`
-  );
-}
-
-async function getRelateByGame(gameId: string): Promise<any> {
-  return await request(
-    `https://api.m.nintendo.com/catalog/games/${gameId}/relatedGames?country=JP&lang=zh-CN`
-  );
-}

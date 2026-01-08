@@ -15,8 +15,10 @@
             {{ computedTitle }}<br />
             <small> {{ computedPlaylistTypeText }}</small>
             <small class="text-desc">
-              {{ t('playlist.trackCount', { count: data.playlist.tracksnum }) }} ·
-              <template v-if="data.duration.hour">{{ data.duration.hour }}{{ t('common.hour') }}</template>
+              {{ t('playlist.trackCount', { count: computedTrackCount }) }} ·
+              <template v-if="data.duration.hour"
+                >{{ data.duration.hour }}{{ t('common.hour') }}</template
+              >
               {{ data.duration.minute }}{{ t('common.minute') }}
             </small>
             <small class="text-desc">{{
@@ -81,6 +83,12 @@ const computedPlaylistTypeText = computed(
         stringMap.getString(data.value.trackGroups[0].game, 'title'),
     })
 );
+const computedTrackCount = computed(() => {
+  return (
+    data.value?.playlist.tracksnum ||
+    data.value?.trackGroups.map((x) => x.tracks.length).reduce((a, b) => a + b)
+  );
+});
 
 useHeader(() => ({
   observeRef: titleRef.value,

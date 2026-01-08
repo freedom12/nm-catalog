@@ -38,6 +38,8 @@ const tbPlaylist: DBTableConfig = {
     );
   `,
   selectById: () => `SELECT * FROM playlist WHERE id = ?`,
+  selectByIds: (ids: string[] = []) =>
+    `SELECT * FROM playlist WHERE id in (${ids.map((id) => `'${id}'`).join(',')})`,
   selectByGid: () => `
     SELECT p.*
     FROM playlist p

@@ -46,10 +46,15 @@
 
 .common-detail {
   display: flex;
-  padding: 0.5rem 0;
+  overflow: hidden;
+  max-height: 300px;
+  opacity: 1;
   text-align: left;
+  @include transition((max-height, opacity));
 
   > div {
+    margin: 0.5rem 0;
+
     &.detail-image {
       width: 200px;
       height: 100px;
@@ -107,7 +112,8 @@
   }
 
   &.hidden {
-    display: none;
+    max-height: 0;
+    opacity: 0;
   }
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="common-detail" v-show="!hidden">
+  <div class="common-detail" :class="{ hidden: hidden }">
     <div class="detail-image">
       <img
         v-fallback

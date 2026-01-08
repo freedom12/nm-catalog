@@ -35,37 +35,36 @@ router.get('/:id/detail', (req: Request, res: Response) => {
       );
       trackGroups.push({ game, tracks });
     } else {
-      if (playlist.tracksnum) {
-        const ptIds = (
-          stmt.playlist_track.selectTrackByPid().all(id) as PlaylistTrack[]
-        ).map((x) => x.id);
-        const pTracks = (stmt.track.selectByIds(ptIds).all() as PlaylistTrack[]).sort(
-          (a, b) => ptIds.indexOf(a.id) - ptIds.indexOf(b.id)
-        );
-        tracks.push(...pTracks);
+      const ptIds = (
+        stmt.playlist_track.selectTrackByPid().all(id) as PlaylistTrack[]
+      ).map((x) => x.id);
+      const pTracks = (stmt.track.selectByIds(ptIds).all() as PlaylistTrack[]).sort(
+        (a, b) => ptIds.indexOf(a.id) - ptIds.indexOf(b.id)
+      );
+      tracks.push(...pTracks);
 
-        if (playlist.isrelatedgame) {
-          const games = stmt.playlist_game.selectGameByPid().all(id) as Game[];
-          tracks.forEach((x, i) => {
-            if (i === 0 || x.gid !== tracks[i - 1].gid) {
-              trackGroups.push({
-                game: games.find((y) => y.id === x.gid),
-                tracks: [],
-              });
-            }
-            const group = trackGroups.at(-1);
-            group!.tracks.push(x);
-          });
-        } else {
-          trackGroups.push({ tracks });
-        }
+      if (playlist.isrelatedgame) {
+        const games = stmt.playlist_game.selectGameByPid().all(id) as Game[];
+        tracks.forEach((x, i) => {
+          if (i === 0 || x.gid !== tracks[i - 1].gid) {
+            trackGroups.push({
+              game: games.find((y) => y.id === x.gid),
+              tracks: [],
+            });
+          }
+          const group = trackGroups.at(-1);
+          group!.tracks.push(x);
+        });
       } else {
-        // const sUtc9 = now.toLocaleString('en-US', {
-        //   timeZone: 'Asia/Tokyo',
-        // });
-        // # daily order (response/playlist_(pid).json)
+        if (playlist.type !== 'SPECIAL') {
+          if (playlist.tracksnum) {
+            // annual playlists: set game data to each track
+          } else {
+            // regular update playlists: to sort by game release
+          }
+        }
 
-        trackGroups.push({ tracks: [] });
+        trackGroups.push({ tracks });
       }
     }
 

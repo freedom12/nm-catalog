@@ -31,8 +31,10 @@ const tbGame: DBTableConfig = {
   `,
   select: () => `SELECT * FROM game ORDER BY inserted DESC`,
   selectById: () => `SELECT * FROM game WHERE id = ?`,
-  selectByIds: (ids: string[] = []) =>
-    `SELECT * FROM game WHERE id in (${ids.join(',')})`,
+  selectByIds: (ids: string[] = [], excludeLink = false) =>
+    `SELECT * FROM game WHERE id in (${ids.map((id) => `'${id}'`).join(',')})${
+      excludeLink ? ` and link == ''` : ''
+    } ORDER BY inserted`,
   selectEntityById: () => `
     WITH RECURSIVE chain AS (
       SELECT *

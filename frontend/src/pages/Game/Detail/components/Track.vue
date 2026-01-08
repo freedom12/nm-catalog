@@ -18,7 +18,8 @@
         (selectedTrackTag === 'TOP' && !track.isbest) ||
         (selectedTrackTag === 'LOOP' && !track.isloop)
       "
-    ></TrackItem>
+    >
+    </TrackItem>
   </section>
 </template>
 

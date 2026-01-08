@@ -1,10 +1,10 @@
 import express, { type Request, type Response } from 'express';
-import axios from 'axios';
 import { Game, GameGroup, GameGroupBy, Playlist, Track } from '@nm-catalog/shared';
 import { stmt } from '../db/statements.js';
 import { DataRow } from '../db/schema/index.js';
 import { COMMON_PATHS } from '../utils/paths.js';
 import { readText, toError, writeText } from '../utils/tools.js';
+import upstreem from '../utils/upstreem.js';
 
 const router = express.Router();
 
@@ -31,11 +31,7 @@ const getGameByYear = async (): Promise<GameGroup[]> => {
     try {
       gameList = getGameList('RELEASE');
 
-      const result: GameGroup[] = (
-        await axios.get(
-          `https://api.m.nintendo.com/catalog/gameGroups?country=JP&groupingPolicy=RELEASEDAT&lang=en-US`
-        )
-      ).data.releasedAt.map((x: DataRow) => ({
+      const result: GameGroup[] = (await upstreem.getGamesByYear()).map((x: DataRow) => ({
         name: x.releasedYear,
         games: (<any>x.items)
           .map((y: DataRow) => gameList.find((z) => z.id === y.id))
@@ -100,22 +96,21 @@ router.get('/hardware', async (_req: Request, res: Response) => {
     try {
       gameList = getGameList('PLATFORM');
 
-      const result: GameGroup[] = (
-        await axios.get(
-          `https://api.m.nintendo.com/catalog/gameGroups?country=JP&groupingPolicy=HARDWARE&lang=en-US`
-        )
-      ).data.hardware.map((x: DataRow) => ({
-        name: x.formalHardware,
-        games: (<any>x.items)
-          .map((y: DataRow) => gameList.find((z) => z.id === y.id))
-          .filter((y: DataRow) => !!y),
-      }));
+      const result: GameGroup[] = (await upstreem.getGamesByHardware()).map(
+        (x: DataRow) => ({
+          name: x.formalHardware,
+          games: (<any>x.items)
+            .map((y: DataRow) => gameList.find((z) => z.id === y.id))
+            .filter((y: DataRow) => !!y),
+        })
+      );
 
       writeText(fileName, result);
       res.json(result);
     } catch (error) {
       const err = toError(error);
       const msg = err.message;
+      console.error(error);
 
       try {
         const result: GameGroup[] = [];
