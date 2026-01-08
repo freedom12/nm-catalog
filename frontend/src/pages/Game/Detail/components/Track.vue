@@ -1,12 +1,13 @@
 <template>
   <section :hidden="hidden">
     <div class="radio-group">
-      <label
-        v-for="tag in computedTrackTags"
-        :key="tag.key"
-        :class="{ disabled: !tag.count }"
-      >
-        <input type="radio" :value="tag.key" v-model="selectedTrackTag" />
+      <label v-for="tag in computedTrackTags" :key="tag.key">
+        <input
+          type="radio"
+          :value="tag.key"
+          v-model="selectedTrackTag"
+          :disabled="!tag.count"
+        />
         <span>{{ t(`track.tag.${tag.key}`) }} ({{ tag.count }})</span>
       </label>
     </div>
@@ -61,5 +62,48 @@ function getTrackCount(mode: TrackTag): number {
 .radio-group {
   margin-bottom: 1.5em;
   text-align: right;
+
+  label {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 1.5em;
+    cursor: pointer;
+
+    input[type='radio'] {
+      margin: 0;
+
+      + span {
+        display: inline-block;
+        opacity: 0.5;
+        font-weight: bolder;
+        font-size: 0.9em;
+        text-indent: 0.5em;
+      }
+
+      &:checked {
+        + span {
+          opacity: 1;
+        }
+      }
+
+      &:disabled {
+        + span {
+          opacity: 0.25;
+          cursor: not-allowed;
+        }
+      }
+    }
+
+    // &.disabled {
+    //   cursor: default;
+    //   pointer-events: none;
+
+    //   input[type='radio'] {
+    //     + span {
+    //       opacity: 0.25;
+    //     }
+    //   }
+    // }
+  }
 }
 </style>

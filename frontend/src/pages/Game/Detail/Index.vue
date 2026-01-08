@@ -1,8 +1,8 @@
 <template>
   <Container :loading="loading">
     <main id="main" v-if="data">
-      <section class="common-detail">
-        <div class="detail-image">
+      <section class="common-detail main">
+        <div class="detail-part detail-image">
           <img
             v-fallback
             :src="imgMap.getPath('game', data.game)"
@@ -10,7 +10,7 @@
             loading="lazy"
           />
         </div>
-        <div class="detail-text">
+        <div class="detail-part detail-text">
           <h1 class="text-main" ref="titleRef">
             {{ computedTitle }}<br />
             <small>{{ data.game.year }} | {{ data.game.hardware }}</small>

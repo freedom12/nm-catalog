@@ -140,7 +140,7 @@ header {
       border: none;
       background-color: transparent;
 
-      &:hover {
+      &:focus {
         + nav {
           opacity: 0.85;
           transform: translateX(0);

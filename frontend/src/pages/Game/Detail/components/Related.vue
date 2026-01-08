@@ -2,7 +2,7 @@
   <section :hidden="hidden">
     <ol>
       <li v-for="relate in data" :key="relate.id" class="common-detail">
-        <div class="detail-image">
+        <div class="detail-part detail-image">
           <img
             v-fallback
             :src="imgMap.getPath('game', relate)"

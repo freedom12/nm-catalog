@@ -1,6 +1,6 @@
 <template>
   <div class="common-detail" :class="{ hidden: hidden }">
-    <div class="detail-image">
+    <div class="detail-part detail-image">
       <img
         v-fallback
         :src="imgMap.getPath('track', data)"
@@ -8,7 +8,7 @@
         loading="lazy"
       />
     </div>
-    <div class="detail-text">
+    <div class="detail-part detail-text">
       <h3 class="prefix-text text-main">
         {{ idx ?? data.idx }}.&nbsp;
         <span>
