@@ -1,8 +1,8 @@
 <template>
   <Container :loading="loading">
     <main id="main" v-if="data">
-      <section class="common-detail">
-        <div class="detail-image">
+      <section class="common-detail main">
+        <div class="detail-part detail-image">
           <img
             v-fallback
             :src="imgMap.getPath('playlist', data.playlist)"
@@ -10,21 +10,21 @@
             loading="lazy"
           />
         </div>
-        <div class="detail-text">
+        <div class="detail-part detail-text">
           <h1 class="text-main" ref="titleRef">
             {{ computedTitle }}<br />
             <small> {{ computedPlaylistTypeText }}</small>
-            <small class="text-desc">
+          </h1>
+          <ul class="text-else">
+            <li>
               {{ t('playlist.trackCount', { count: computedTrackCount }) }} ·
               <template v-if="data.duration.hour"
                 >{{ data.duration.hour }}{{ t('common.hour') }}</template
               >
               {{ data.duration.minute }}{{ t('common.minute') }}
-            </small>
-            <small class="text-desc">{{
-              stringMap.getString(data.playlist, 'desc')
-            }}</small>
-          </h1>
+            </li>
+            <li>{{ stringMap.getString(data.playlist, 'desc') }}</li>
+          </ul>
         </div>
       </section>
       <section class="detail">
